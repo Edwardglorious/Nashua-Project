@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nashua CRM Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d1f1f 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a0033 0%, #330066 100%);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #ff0066;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .logo-subtitle {
+            font-size: 10px;
+            opacity: 0.7;
+            letter-spacing: 2px;
+        }
+
+        .login-btn {
+            background: #ff0000;
+            color: white;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .login-btn:hover {
+            background: #cc0000;
+        }
+
+        .nav {
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            padding: 0 20px;
+            border-bottom: 2px solid #4a4a4a;
+        }
+
+        .nav-item {
+            padding: 18px 30px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom-color: #ff0066;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            background: linear-gradient(135deg, rgba(80, 30, 30, 0.4) 0%, rgba(60, 20, 20, 0.6) 100%);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .add-btn {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff4757 100%);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3);
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 71, 87, 0.4);
+        }
+
+        .close-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 10px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .customer-form {
+            max-width: 800px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 25px;
+            font-size: 15px;
+            color: #333;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(255, 102, 102, 0.3);
+        }
+
+        .form-input::placeholder {
+            color: #888;
+        }
+
+        .form-textarea {
+            border-radius: 15px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .submit-btn {
+            flex: 1;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        .cancel-btn {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 15px 30px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .cancel-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        th {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #ff0066;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 10px 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-completed { background: #27ae60; }
+        .status-pending { background: #f39c12; }
+        .status-ongoing { background: #3498db; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <div class="logo">Nashua</div>
+            <div class="logo-subtitle">ENTERPRISE BUSINESS SAAS</div>
+        </div>
+        <button class="login-btn">Log In</button>
+    </div>
+
+    <div class="nav">
+        <div class="nav-item">Dashboard</div>
+        <div class="nav-item">Customers</div>
+        <div class="nav-item">Sales Pipeline</div>
+        <div class="nav-item">Order and Invoices</div>
+        <div class="nav-item">Analytics & Reports</div>
+    </div>
+
+    <div class="content">
+        <!-- Add New Customer Form (Initially Hidden) -->
+        <div id="addCustomerForm" class="section" style="display: none;">
+            <div class="section-header">
+                <h2 class="section-title">Add New Customer</h2>
+                <button class="close-btn" onclick="hideAddForm()">✕ Close</button>
+            </div>
+            <form class="customer-form">
+                <div class="form-group">
+                    <label class="form-label">Customer Name</label>
+                    <input type="text" class="form-input" placeholder="Required" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Customer Company</label>
+                    <input type="text" class="form-input" placeholder="must be a valid company" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Customer Company Nationality</label>
+                    <input type="text" class="form-input" placeholder="Required" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Customer Region</label>
+                    <input type="text" class="form-input" placeholder="Required" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Customer Contact</label>
+                    <input type="tel" class="form-input" placeholder="must be only number" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Customer Notes</label>
+                    <textarea class="form-input form-textarea" placeholder="required" rows="4" required></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="submit-btn">Add Customer</button>
+                    <button type="button" class="cancel-btn" onclick="hideAddForm()">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="section" id="customerListSection">
+            <div class="section-header">
+                <h2 class="section-title">Customer Lists</h2>
+                <button class="add-btn" onclick="showAddForm()">+ Add New</button>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Customer_ID</th>
+                            <th>Customer_Name</th>
+                            <th>Customer_Company</th>
+                            <th>Nationality</th>
+                            <th>Customer_Category</th>
+                            <th>Customer_Contact</th>
+                            <th>Customer_Region</th>
+                            <th>Total_Transaction</th>
+                            <th>Total_Amount (USD)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>CU0001</td>
+                            <td>James Wang</td>
+                            <td>Amazon</td>
+                            <td>United States</td>
+                            <td>Tech Solutions</td>
+                            <td>+1 206 266 1000</td>
+                            <td>North America</td>
+                            <td>15</td>
+                            <td>25,000</td>
+                        </tr>
+                        <tr>
+                            <td>CU0002</td>
+                            <td>Berglynn Lee</td>
+                            <td>United States</td>
+                            <td>United States</td>
+                            <td>Retail Business</td>
+                            <td>+1 212 555 1234</td>
+                            <td>Europe</td>
+                            <td>8</td>
+                            <td>9,500</td>
+                        </tr>
+                        <tr>
+                            <td>CU0003</td>
+                            <td>Alex Martin</td>
+                            <td>Mercedes</td>
+                            <td>Germany</td>
+                            <td>Manufacturing</td>
+                            <td>+49 621 1854 3000</td>
+                            <td>Europe</td>
+                            <td>22</td>
+                            <td>45,000</td>
+                        </tr>
+                        <tr>
+                            <td>CU0004</td>
+                            <td>Eva Brown</td>
+                            <td>Volkswagen</td>
+                            <td>Germany</td>
+                            <td>Automotive</td>
+                            <td>+49 5361 9091 01</td>
+                            <td>Europe</td>
+                            <td>18</td>
+                            <td>32,000</td>
+                        </tr>
+                        <tr>
+                            <td>CU0005</td>
+                            <td>Emily Zhang</td>
+                            <td>China</td>
+                            <td>China</td>
+                            <td>Value Tech</td>
+                            <td>+86 135 9999 2345</td>
+                            <td>Middle East & Africa</td>
+                            <td>7</td>
+                            <td>8,800</td>
+                        </tr>
+                        <tr>
+                            <td>CU0006</td>
+                            <td>Fatima Ahmed</td>
+                            <td>Riyadh</td>
+                            <td>Saudi Arabia</td>
+                            <td>Oil & Gas</td>
+                            <td>+966 11 2110 010</td>
+                            <td>Middle East</td>
+                            <td>12</td>
+                            <td>28,500</td>
+                        </tr>
+                        <tr>
+                            <td>CU0007</td>
+                            <td>Carlos Silva</td>
+                            <td>Brazil</td>
+                            <td>Brazil</td>
+                            <td>Agriculture</td>
+                            <td>+55 11 3040 7000</td>
+                            <td>Latin America</td>
+                            <td>9</td>
+                            <td>12,300</td>
+                        </tr>
+                        <tr>
+                            <td>CU0008</td>
+                            <td>Hans Schmidt</td>
+                            <td>Aeudi</td>
+                            <td>Germany</td>
+                            <td>Design</td>
+                            <td>+49 841 8901 0</td>
+                            <td>Europe</td>
+                            <td>14</td>
+                            <td>19,800</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">Transaction History</h2>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Transaction_ID</th>
+                            <th>Customer_ID</th>
+                            <th>Transaction_Date</th>
+                            <th>Payment_Method</th>
+                            <th>Total_Amount (USD)</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>TX0001</td>
+                            <td>CU0001</td>
+                            <td>2025-10-15</td>
+                            <td>Credit Card</td>
+                            <td>1,250</td>
+                            <td><span class="status-badge status-completed">Completed</span></td>
+                        </tr>
+                        <tr>
+                            <td>TX0002</td>
+                            <td>CU0002</td>
+                            <td>2025-10-14</td>
+                            <td>PayPal</td>
+                            <td>680</td>
+                            <td><span class="status-badge status-completed">Completed</span></td>
+                        </tr>
+                        <tr>
+                            <td>TX0003</td>
+                            <td>CU0003</td>
+                            <td>2025-10-14</td>
+                            <td>Bank Transfer</td>
+                            <td>3,200</td>
+                            <td><span class="status-badge status-pending">Pending</span></td>
+                        </tr>
+                        <tr>
+                            <td>TX0004</td>
+                            <td>CU0004</td>
+                            <td>2025-10-13</td>
+                            <td>Credit Card</td>
+                            <td>890</td>
+                            <td><span class="status-badge status-completed">Completed</span></td>
+                        </tr>
+                        <tr>
+                            <td>TX0005</td>
+                            <td>CU0005</td>
+                            <td>2025-10-12</td>
+                            <td>Credit Card</td>
+                            <td>445</td>
+                            <td><span class="status-badge status-ongoing">Ongoing</span></td>
+                        </tr>
+                        <tr>
+                            <td>TX0006</td>
+                            <td>CU0006</td>
+                            <td>2025-10-12</td>
+                            <td>PayPal</td>
+                            <td>2,150</td>
+                            <td><span class="status-badge status-completed">Completed</span></td>
+                        </tr>
+                        <tr>
+                            <td>TX0007</td>
+                            <td>CU0007</td>
+                            <td>2025-10-11</td>
+                            <td>Bank Transfer</td>
+                            <td>1,890</td>
+                            <td><span class="status-badge status-completed">Completed</span></td>
+                        </tr>
+                        <tr>
+                            <td>TX0008</td>
+                            <td>CU0008</td>
+                            <td>2025-10-10</td>
+                            <td>Cash</td>
+                            <td>320</td>
+                            <td><span class="status-badge status-pending">Pending</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-container" style="margin-top: 30px;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Detail_ID</th>
+                            <th>Transaction_ID</th>
+                            <th>Product_ID</th>
+                            <th>Product_Name</th>
+                            <th>Quantity</th>
+                            <th>Unit_Price (USD)</th>
+                            <th>Subtotal (USD)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>D001</td>
+                            <td>TX0001</td>
+                            <td>P001</td>
+                            <td>UltraGrip 2" Tape</td>
+                            <td>2</td>
+                            <td>5</td>
+                            <td>10</td>
+                        </tr>
+                        <tr>
+                            <td>D002</td>
+                            <td>TX0001</td>
+                            <td>P005</td>
+                            <td>PowerBond Heavy</td>
+                            <td>5</td>
+                            <td>4.2</td>
+                            <td>21</td>
+                        </tr>
+                        <tr>
+                            <td>D003</td>
+                            <td>TX0002</td>
+                            <td>P002</td>
+                            <td>MegaStick 2" Tape</td>
+                            <td>3</td>
+                            <td>6</td>
+                            <td>18</td>
+                        </tr>
+                        <tr>
+                            <td>D004</td>
+                            <td>TX0003</td>
+                            <td>P002</td>
+                            <td>MegaStick 2" Tape</td>
+                            <td>3</td>
+                            <td>4.5</td>
+                            <td>13.5</td>
+                        </tr>
+                        <tr>
+                            <td>D005</td>
+                            <td>TX0003</td>
+                            <td>P004</td>
+                            <td>EcoGrip Tape</td>
+                            <td>5</td>
+                            <td>4.3</td>
+                            <td>21.5</td>
+                        </tr>
+                        <tr>
+                            <td>D006</td>
+                            <td>TX0004</td>
+                            <td>P001</td>
+                            <td>UltraGrip 2" Tape</td>
+                            <td>3</td>
+                            <td>4</td>
+                            <td>12</td>
+                        </tr>
+                        <tr>
+                            <td>D007</td>
+                            <td>TX0004</td>
+                            <td>P002</td>
+                            <td>MegaStick 2" Tape</td>
+                            <td>2</td>
+                            <td>5</td>
+                            <td>10</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showAddForm() {
+            document.getElementById('addCustomerForm').style.display = 'block';
+            document.getElementById('customerListSection').style.display = 'none';
+            document.querySelectorAll('.section')[2].style.display = 'none'; // Hide transaction history
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function hideAddForm() {
+            document.getElementById('addCustomerForm').style.display = 'none';
+            document.getElementById('customerListSection').style.display = 'block';
+            document.querySelectorAll('.section')[2].style.display = 'block'; // Show transaction history
+        }
+
+        // Handle form submission
+        document.querySelector('.customer-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Customer added successfully!');
+            hideAddForm();
+            this.reset();
+        });
+    </script>
+</body>
+</html>
