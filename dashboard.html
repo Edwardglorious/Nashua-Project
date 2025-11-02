@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nashua CRM Dashboard</title>
+  <style>
+    /* ===== GLOBAL ===== */
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      background-color: #f0f0f0;
+      color: #333;
+    }
+    .hidden { display: none !important; }
+
+    /* ===== LOGIN VIEW ===== */
+    #login-view {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d1f1f 100%);
+    }
+    .login-container {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 300px;
+      text-align: center;
+    }
+    .input-group { margin-bottom: 1.5rem; text-align: left; }
+    .input-group label { display: block; margin-bottom: .5rem; color: #555; }
+    .input-group input {
+      width: 100%;
+      padding: .75rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    .login-container button {
+      width: 100%;
+      padding: .75rem;
+      border: none;
+      border-radius: 4px;
+      background-color: #c00;
+      color: white;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color .3s;
+    }
+    .login-container button:hover { background-color: #a00; }
+    #error-message { color: red; font-size: .9em; margin-top: 1rem; }
+
+    /* ===== DASHBOARD ===== */
+    .top-bar {
+      background: linear-gradient(90deg, rgba(50,0,0,1) 0%, rgba(150,0,0,1) 70%, rgba(204,0,0,1) 100%);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 30px;
+      color: white;
+    }
+    .logo { font-size: 24px; font-weight: bold; }
+    .logo .subtext {
+      font-size: 8px;
+      letter-spacing: 1px;
+      display: block;
+      text-transform: uppercase;
+      color: #ccc;
+    }
+    .login-link { color: white; text-decoration: none; font-weight: bold; }
+    .main-nav {
+      background-color: #333;
+      padding: 12px 20px;
+    }
+    .main-nav ul {
+      list-style: none;
+      display: flex;
+      gap: 25px;
+      margin: 0;
+      padding: 0;
+    }
+    .main-nav a {
+      color: #ccc;
+      text-decoration: none;
+      font-size: 14px;
+      transition: color .3s;
+    }
+    .main-nav a:hover, .main-nav a.active { color: #fff; }
+    .content-area { padding: 2rem; background: #1a1a1a; min-height: calc(100vh - 120px); }
+
+    /* ===== PIPELINE ===== */
+    .section {
+      background: rgba(80,30,30,0.5);
+      border-radius: 10px;
+      padding: 25px;
+      margin-bottom: 30px;
+    }
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+    .section-title { font-size: 22px; font-weight: 600; color: #fff; }
+    .add-btn {
+      cursor: pointer; border: none; border-radius: 20px; padding: 10px 20px;
+      transition: all .3s; font-weight: 600;
+      background: linear-gradient(135deg,#ff6b6b,#ff4757);
+      color:#fff; box-shadow:0 4px 10px rgba(255,71,87,.3);
+    }
+    .add-btn:hover { transform:translateY(-2px); }
+
+    .pipeline {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 15px;
+    }
+    .pipeline-column {
+      background:#3a3a3a;
+      border-radius:8px;
+      padding:15px;
+      display:flex;
+      flex-direction:column;
+      min-height:480px;
+    }
+    .pipeline-column.drop-target {
+      background: #4a4a4a;
+      border: 2px dashed #ff4757;
+    }
+    .column-header {
+      display:flex;justify-content:space-between;align-items:center;
+      padding-bottom:10px;border-bottom:1px solid #555;margin-bottom:15px;
+    }
+    .column-title {font-size:13px;text-transform:uppercase;color:#fff;}
+    .add-card-btn {
+      background:#ff4757;border:none;color:#fff;width:28px;height:28px;
+      border-radius:50%;cursor:pointer;transition:all .3s;
+    }
+    .add-card-btn:hover {background:#ff3344;transform:scale(1.1);}
+    .cards-container {display:flex;flex-direction:column;gap:10px;flex:1;}
+    .deal-card {
+      background:#fff;color:#1a1a1a;border-radius:6px;padding:12px;
+      cursor:move;transition:all .3s;user-select:none;
+    }
+    .deal-card:hover {transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.3);}
+    .deal-card.dragging { opacity: 0.5; }
+    .deal-header { font-size: 11px; color: #666; margin-bottom: 8px; }
+    .deal-name { font-weight: 600; margin-bottom: 5px; font-size: 14px; }
+    .deal-meta { color: #666; font-size: 12px; }
+
+    .sidebar {
+      position:fixed;right:-400px;top:0;width:400px;height:100vh;
+      background:#2a2a2a;transition:right .3s;z-index:1000;padding:30px;
+      overflow-y:auto;
+    }
+    .sidebar.active {right:0;}
+    .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; color: #fff; }
+    .close-btn {background:none;border:none;color:#fff;font-size:28px;cursor:pointer;}
+    .form-group {margin-bottom:20px;}
+    .form-group label { display: block; margin-bottom: 8px; color: #aaa; font-size: 14px; }
+    .form-group input, .form-group select {
+      width:100%;padding:10px;background:#1a1a1a;border:1px solid #3a3a3a;
+      color:#fff;border-radius:5px;box-sizing:border-box;
+    }
+    .submit-btn {
+      width: 100%;
+      padding: 12px;
+      background: #ff4757;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+    .submit-btn:hover { background: #ff3344; }
+
+    /* ===== ANALYTICS DASHBOARD ===== */
+    .analytics-dashboard {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: #2a2a2a;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    }
+
+    .card-header {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: #fff;
+    }
+
+    .customers-table, .followup-table, .order-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .customers-table th, .followup-table th, .order-table th {
+      background: #8b2e3b;
+      padding: 8px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 11px;
+      color: #fff;
+    }
+
+    .customers-table td, .followup-table td, .order-table td {
+      background: #f5f5f5;
+      color: #1a1a1a;
+      padding: 6px 8px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .customers-table tr:hover td, .order-table tr:hover td, .followup-table tr:hover td {
+      background: #e8e8e8;
+    }
+
+    .performance-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .performance-card {
+      background: #b84452;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .performance-card:hover {
+      background: #c94f5e;
+      transform: translateY(-2px);
+    }
+
+    .performance-title {
+      font-size: 11px;
+      margin-bottom: 8px;
+      opacity: 0.9;
+      color: #fff;
+    }
+
+    .performance-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .pipeline-overview {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+    }
+
+    .pipeline-stage {
+      background: #8b2e3b;
+      border-radius: 8px;
+      padding: 80px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pipeline-stage:nth-child(2) { background: #a73948; }
+    .pipeline-stage:nth-child(3) { background: #c94f5e; }
+    .pipeline-stage:nth-child(4) { background: #ff6b7a; }
+
+    .pipeline-stage:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+    }
+
+    .pipeline-stage-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    @media (max-width: 1024px) {
+      .analytics-dashboard {
+        grid-template-columns: 1fr;
+      }
+      .pipeline {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .pipeline-overview {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .performance-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .pipeline {
+        grid-template-columns: 1fr;
+      }
+      .pipeline-overview {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        width: 100%;
+        right: -100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN VIEW -->
+<main id="login-view">
+  <div class="login-container">
+    <form id="login-form">
+      <h2>Admin Login</h2>
+      <div class="input-group">
+        <label for="username">Email atau Username</label>
+        <input type="text" id="username" required />
+      </div>
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" required />
+      </div>
+      <button type="submit">Log In</button>
+      <p id="error-message"></p>
+    </form>
+  </div>
+</main>
+
+<!-- DASHBOARD VIEW -->
+<main id="dashboard-view" class="hidden">
+  <header class="top-bar">
+    <div class="logo">
+      Nashua
+      <span class="subtext">INDUSTRIAL ADHESIVE TAPE</span>
+    </div>
+    <a href="#" id="logout-link" class="login-link">Log Out</a>
+  </header>
+
+  <nav class="main-nav">
+    <ul>
+      <li><a href="#" class="active" data-page="dashboard">Dashboard</a></li>
+      <li><a href="#" data-page="customers">Customers</a></li>
+      <li><a href="#" data-page="sales">Sales Pipeline</a></li>
+      <li><a href="#" data-page="orders">Order & Invoices</a></li>
+      <li><a href="#" data-page="reports">Analytics & Reports</a></li>
+    </ul>
+  </nav>
+
+  <div class="content-area" id="content-area">
+    <h1 style="color: #fff;">Selamat Datang di Dashboard</h1>
+    <p style="color: #ccc;">Ini adalah area konten utama.</p>
+    <p style="color: #ccc;">Pilih menu di atas untuk navigasi.</p>
+  </div>
+</main>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const loginView = document.getElementById("login-view");
+  const dashboardView = document.getElementById("dashboard-view");
+  const loginForm = document.getElementById("login-form");
+  const username = document.getElementById("username");
+  const password = document.getElementById("password");
+  const errorMsg = document.getElementById("error-message");
+  const logoutBtn = document.getElementById("logout-link");
+  const navLinks = document.querySelectorAll(".main-nav a");
+  const contentArea = document.querySelector(".content-area");
+
+  const validUser1 = "admin@gmail.com";
+  const validUser2 = "admin1";
+  const validPass = "admin123";
+
+  const dashboardTemplate = `
+    <div class="analytics-dashboard">
+      <div class="card">
+        <div class="card-header">Top 10 Customers</div>
+        <table class="customers-table">
+          <thead>
+            <tr>
+              <th>Customer_ID</th>
+              <th>Customer</th>
+              <th>Total_Transaction</th>
+              <th>Total_Amount (USD)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>C0001</td><td>Alex Tan</td><td>15</td><td>9,500</td></tr>
+            <tr><td>C0002</td><td>Benjamin Lee</td><td>12</td><td>8,200</td></tr>
+            <tr><td>C0003</td><td>Catherine Wong</td><td>10</td><td>7,800</td></tr>
+            <tr><td>C0004</td><td>David Chen</td><td>9</td><td>6,900</td></tr>
+            <tr><td>C0005</td><td>Emily Zhang</td><td>8</td><td>6,450</td></tr>
+            <tr><td>C0006</td><td>Frank Yusuf</td><td>22</td><td>15,600</td></tr>
+            <tr><td>C0007</td><td>Grace Kim</td><td>18</td><td>12,300</td></tr>
+            <tr><td>C0008</td><td>Henry Gunawan</td><td>14</td><td>9,800</td></tr>
+            <tr><td>C0009</td><td>Irene Susilo</td><td>11</td><td>7,500</td></tr>
+            <tr><td>C0010</td><td>Jason Hartono</td><td>25</td><td>18,900</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-header">Performance Summary</div>
+        <div class="performance-grid">
+          <div class="performance-card">
+            <div class="performance-title">Monthly Total Sales</div>
+            <div class="performance-value">$285k</div>
+          </div>
+          <div class="performance-card">
+            <div class="performance-title">Lead Conversion Rate</div>
+            <div class="performance-value">68%</div>
+          </div>
+          <div class="performance-card">
+            <div class="performance-title">Monthly Deal Closed</div>
+            <div class="performance-value">47</div>
+          </div>
+          <div class="performance-card">
+            <div class="performance-title">Qualified Leads</div>
+            <div class="performance-value">156</div>
+          </div>
+          <div class="performance-card">
+            <div class="performance-title">Sales Closed</div>
+            <div class="performance-value">234</div>
+          </div>
+          <div class="performance-card">
+            <div class="performance-title">Monthly sold units</div>
+            <div class="performance-value">1,847</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">Pending Follow Up</div>
+        <table class="followup-table">
+          <thead>
+            <tr>
+              <th>Transaction_ID</th>
+              <th>Customer_ID</th>
+              <th>Transaction_Date</th>
+              <th>Payment_Method</th>
+              <th>Est_Amount (USD)</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>TXN045</td><td>C1205</td><td>2025-11-05</td><td>Bank Transfer</td><td>5,200</td><td>Pending</td></tr>
+            <tr><td>TXN046</td><td>C1208</td><td>2025-11-06</td><td>Credit Card</td><td>3,800</td><td>Pending</td></tr>
+            <tr><td>TXN047</td><td>C1212</td><td>2025-11-08</td><td>PayPal</td><td>4,500</td><td>Pending</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-header">Newest Order</div>
+        <table class="order-table">
+          <thead>
+            <tr>
+              <th>Order_ID</th>
+              <th>Customer_ID</th>
+              <th>Transaction_ID</th>
+              <th>Product_Name</th>
+              <th>Quantity</th>
+              <th>Total_Price</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>20547</td><td>C0089</td><td>TXN547</td><td>EcoSeal Tape</td><td>15</td><td>$675</td><td>Nov 2</td></tr>
+            <tr><td>20546</td><td>C0072</td><td>TXN546</td><td>Masking 2" Tape</td><td>25</td><td>$1,125</td><td>Nov 1</td></tr>
+            <tr><td>20545</td><td>C0055</td><td>TXN545</td><td>PowerBond Hitam</td><td>10</td><td>$550</td><td>Oct 31</td></tr>
+            <tr><td>20544</td><td>C0041</td><td>TXN544</td><td>Double Sided Tape</td><td>30</td><td>$1,800</td><td>Oct 30</td></tr>
+            <tr><td>20543</td><td>C0033</td><td>TXN543</td><td>Clear Packing Tape</td><td>50</td><td>$2,250</td><td>Oct 29</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card" style="grid-column: 1 / -1;">
+        <div class="card-header">Sales Pipeline Overview</div>
+        <div class="pipeline-overview">
+          <div class="pipeline-stage">
+            <div class="pipeline-stage-name">Lead</div>
+          </div>
+          <div class="pipeline-stage">
+            <div class="pipeline-stage-name">Qualification</div>
+          </div>
+          <div class="pipeline-stage">
+            <div class="pipeline-stage-name">Proposal</div>
+          </div>
+          <div class="pipeline-stage">
+            <div class="pipeline-stage-name">Negotiation</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  /* CUSTOMERS TEMPLATE */
+  const customersTemplate = `
+    <div class="customers-wrapper">
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">Customer Lists</h2>
+          <button class="add-btn" id="addCustomerBtn">+ Add New</button>
+        </div>
+        <div id="customersList" style="min-height:250px;">
+          <table class="customers-table">
+            <thead>
+              <tr>
+                <th>Customer_ID</th>
+                <th>Customer</th>
+                <th>Transaction_History</th>
+                <th>Total_Transaction</th>
+                <th>Total_Amount</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="customersTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">Transaction History</h2>
+        </div>
+        <div id="transactionHistory" style="overflow-x:auto;">
+          <table class="customers-table">
+            <thead>
+              <tr>
+                <th>Order_ID</th>
+                <th>Customer_ID</th>
+                <th>Transaction_ID</th>
+                <th>Product_ID</th>
+                <th>Product_Name</th>
+                <th>Quantity</th>
+                <th>Unit_Price (USD)</th>
+                <th>Subtotal (USD)</th>
+              </tr>
+            </thead>
+            <tbody id="transactionTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar" id="customerSidebar">
+      <div class="sidebar-header">
+        <h2 id="customerFormTitle">Add New Customer</h2>
+        <button class="close-btn" id="closeCustomerSidebar">×</button>
+      </div>
+      <form id="customerForm">
+        <div class="form-group">
+          <label>Customer Name</label>
+          <input type="text" id="custName" required>
+        </div>
+        <div class="form-group">
+          <label>Customer ID</label>
+          <input type="text" id="custId" required>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="custEmail" required>
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="tel" id="custPhone" required>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="custStatus">
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+            <option value="Pending">Pending</option>
+          </select>
+        </div>
+        <button type="submit" class="submit-btn" id="customerSubmitBtn">Add Customer</button>
+        <button type="button" class="cancel-btn" id="cancelCustomerBtn" style="width:100%;margin-top:10px;">Cancel</button>
+      </form>
+    </div>
+  `;
+
+  /* SALES PIPELINE TEMPLATE */
+  const pipelineTemplate = `
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">Sales Pipeline</h2>
+        <button class="add-btn" id="addDealBtn">+ Add New Deal</button>
+      </div>
+      <div class="pipeline" id="pipeline"></div>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h2>Add New Deal</h2>
+        <button class="close-btn" id="closeSidebar">×</button>
+      </div>
+      <form id="dealForm">
+        <div class="form-group"><label>Deal Title</label><input type="text" id="dealTitle" required></div>
+        <div class="form-group"><label>Customer/Company</label><input type="text" id="customerName" required></div>
+        <div class="form-group"><label>Deal ID</label><input type="text" id="dealId" required></div>
+        <div class="form-group">
+          <label>Stage</label>
+          <select id="dealStage">
+            <option value="NEW LEAD">NEW LEAD</option>
+            <option value="QUALIFICATION">QUALIFICATION</option>
+            <option value="PROPOSAL">PROPOSAL</option>
+            <option value="NEGOTIATION">NEGOTIATION</option>
+            <option value="CLOSED/WON">CLOSED/WON</option>
+          </select>
+        </div>
+        <button type="submit" class="submit-btn">Add Deal</button>
+      </form>
+    </div>
+  `;
+
+  /* ANALYTICS TEMPLATE */
+  const analyticsTemplate = `
+    <div class="analytics-dashboard">
+      <div class="card">
+        <div class="card-header">Top 10 Customers</div>
+        <table class="customers-table">
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Total Qty</th>
+              <th>Total Amount</th>
+              <th>Accounting</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>John Doe</td><td>5</td><td>$125,000</td><td>$125,000</td></tr>
+            <tr><td>Emily Brown</td><td>4</td><td>$98,500</td><td>$98,500</td></tr>
+            <tr><td>Michael Smith</td><td>3</td><td>$87,200</td><td>$87,200</td></tr>
+            <tr><td>Sarah Wilson</td><td>3</td><td>$76,800</td><td>$76,800</td></tr>
+            <tr><td>David Lee</td><td>2</td><td>$65,000</td><td>$65,000</td></tr>
+            <tr><td>Lisa Anderson</td><td>2</td><td>$54,300</td><td>$54,300</td></tr>
+            <tr><td>James Taylor</td><td>2</td><td>$48,900</td><td>$48,900</td></tr>
+            <tr><td>Emma Martinez</td><td>1</td><td>$42,500</td><td>$42,500</td></tr>
+            <tr><td>Robert Johnson</td><td>1</td><td>$38,700</td><td>$38,700</td></tr>
+            <tr><td>Maria Garcia</td><td>1</td><td>$35,000</td><td>$35,000</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-header">Performance Summary</div>
+        <div class="performance-grid">
+          <div class="performance-card">
+            <div class="performance-title">Pending Total Sales</div>
+            <div class="performance-value">142</div>
+          </div>
+          <div class="performance-card">
+            <div class="performance-title">Total Conversion Rate</div>
+            <div class="performance-value">68%</div>
+          </div>
+          <div class="performance-card">
+            <div class="performance-title">Monthly Deal Count</div>
+            <div class="performance-value">89</div>
+          </div>
+          <div class="performance-card">
+            <div class="performance-title">Shortest Lead</div>
+            <div class="performance-value">3d</div>
+          </div>
+          <div class="performance-card">
+            <div class="performance-title">Sales Closed</div>
+            <div class="performance-value">234</div>
+          </div>
+          <div class="performance-card">
+            <div class="performance-title">Monthly AVG</div>
+            <div class="performance-value">$45k</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">Pending Follow Up</div>
+        <table class="followup-table">
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Deal</th>
+              <th>Scheduled</th>
+              <th>Status</th>
+              <th>Actual</th>
+              <th>Est Close</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Alex Johnson</td><td>Cloud Migration</td><td>Nov 5</td><td>Pending</td><td>-</td><td>Nov 15</td></tr>
+            <tr><td>Sophia Chen</td><td>Software License</td><td>Nov 6</td><td>Pending</td><td>-</td><td>Nov 20</td></tr>
+            <tr><td>Marcus Brown</td><td>Consulting Svc</td><td>Nov 8</td><td>Pending</td><td>-</td><td>Nov 25</td></tr>
+            <tr><td>Nina Patel</td><td>Hardware Upgrade</td><td>Nov 10</td><td>Pending</td><td>-</td><td>Dec 1</td></tr>
+            <tr><td>Tom Harris</td><td>Training Program</td><td>Nov 12</td><td>Pending</td><td>-</td><td>Dec 5</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-header">Newest Order</div>
+        <table class="order-table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>Amount</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>ORD-2547</td><td>Jennifer White</td><td>$12,500</td><td>Nov 2</td></tr>
+            <tr><td>ORD-2546</td><td>Kevin Park</td><td>$8,900</td><td>Nov 1</td></tr>
+            <tr><td>ORD-2545</td><td>Rachel Green</td><td>$15,200</td><td>Oct 31</td></tr>
+            <tr><td>ORD-2544</td><td>Chris Evans</td><td>$6,800</td><td>Oct 30</td></tr>
+            <tr><td>ORD-2543</td><td>Amanda Liu</td><td>$22,100</td><td>Oct 29</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card" style="grid-column: 1 / -1;">
+        <div class="card-header">Sales Pipeline Overview</div>
+        <div class="pipeline-overview">
+          <div class="pipeline-stage">
+            <div class="pipeline-count">99</div>
+            <div class="pipeline-stage-name">Lead</div>
+          </div>
+          <div class="pipeline-stage">
+            <div class="pipeline-count">40</div>
+            <div class="pipeline-stage-name">Qualification</div>
+          </div>
+          <div class="pipeline-stage">
+            <div class="pipeline-count">15</div>
+            <div class="pipeline-stage-name">Proposal</div>
+          </div>
+          <div class="pipeline-stage">
+            <div class="pipeline-count">8</div>
+            <div class="pipeline-stage-name">Negotiation</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  /* === LOGIN LOGIC === */
+  function checkLogin() {
+    if (sessionStorage.getItem("isAdminLoggedIn") === "true") {
+      loginView.classList.add("hidden");
+      dashboardView.classList.remove("hidden");
+    } else {
+      loginView.classList.remove("hidden");
+      dashboardView.classList.add("hidden");
+    }
+  }
+
+  loginForm.addEventListener("submit", e => {
+    e.preventDefault();
+    if ((username.value === validUser1 || username.value === validUser2) && password.value === validPass) {
+      sessionStorage.setItem("isAdminLoggedIn", "true");
+      checkLogin();
+      errorMsg.textContent = "";
+    } else {
+      errorMsg.textContent = "Username atau password salah.";
+    }
+  });
+
+  logoutBtn.addEventListener("click", e => {
+    e.preventDefault();
+    sessionStorage.removeItem("isAdminLoggedIn");
+    checkLogin();
+  });
+
+  /* === NAVIGATION === */
+  navLinks.forEach(link => {
+    link.addEventListener("click", e => {
+      e.preventDefault();
+      navLinks.forEach(l => l.classList.remove("active"));
+      link.classList.add("active");
+
+      const page = link.getAttribute("data-page");
+      
+      if (page === "sales") {
+        contentArea.innerHTML = pipelineTemplate;
+        initPipeline();
+      } else if (page === "reports") {
+        contentArea.innerHTML = analyticsTemplate;
+        initAnalytics();
+      } else if (page === "customers") {
+        contentArea.innerHTML = customersTemplate;
+        initCustomers();
+      } else {
+        contentArea.innerHTML = dashboardTemplate;
+        initDashboard();
+      }
+    });
+  });
+
+  /* ====== PIPELINE LOGIC ====== */
+  function initPipeline() {
+    const stages = ["NEW LEAD", "QUALIFICATION", "PROPOSAL", "NEGOTIATION", "CLOSED/WON"];
+    const deals = {
+      "NEW LEAD": [
+        { title: "Project A - Initial Contact", customer: "PT. ABC", id: "SLK003" },
+        { title: "Cold Call - Potential Client X", customer: "PT. XYZ", id: "SLK004" }
+      ],
+      "QUALIFICATION": [
+        { title: "Follow up - Client Y", customer: "Client Y", id: "QIF002" }
+      ],
+      "PROPOSAL": [
+        { title: "PT. Jaya Makmur - Assessment", customer: "PT. Jaya Makmur", id: "NFO01" }
+      ],
+      "NEGOTIATION": [
+        { title: "Contract Review - PT. Sinar", customer: "PT. Sinar Sentosa", id: "NFOO1" }
+      ],
+      "CLOSED/WON": []
+    };
+
+    const pipeline = document.getElementById("pipeline");
+    const sidebar = document.getElementById("sidebar");
+    const dealForm = document.getElementById("dealForm");
+    const addBtn = document.getElementById("addDealBtn");
+    const closeBtn = document.getElementById("closeSidebar");
+
+    let draggedElement = null;
+    let sourceStage = null;
+    let draggedIndex = null;
+
+    function renderPipeline() {
+      pipeline.innerHTML = "";
+      stages.forEach(stage => {
+        const col = document.createElement("div");
+        col.className = "pipeline-column";
+        col.dataset.stage = stage;
+        col.innerHTML = `
+          <div class="column-header">
+            <span class="column-title">${stage}</span>
+            <button class="add-card-btn" data-stage="${stage}">+</button>
+          </div>
+          <div class="cards-container" id="${stage.replace("/", "-").replace(" ", "-")}-cards"></div>
+        `;
+        pipeline.appendChild(col);
+
+        const container = col.querySelector(".cards-container");
+        
+        deals[stage].forEach((deal, i) => {
+          const card = document.createElement("div");
+          card.className = "deal-card";
+          card.draggable = true;
+          card.dataset.stage = stage;
+          card.dataset.index = i;
+          card.innerHTML = `
+            <div class="deal-header">Rp 300.000.000</div>
+            <div class="deal-name">${deal.title}</div>
+            <div class="deal-meta">ID: ${deal.id}</div>
+          `;
+          
+          card.addEventListener("dragstart", handleDragStart);
+          card.addEventListener("dragend", handleDragEnd);
+          
+          container.appendChild(card);
+        });
+
+        container.addEventListener("dragover", handleDragOver);
+        container.addEventListener("dragenter", handleDragEnter);
+        container.addEventListener("dragleave", handleDragLeave);
+        container.addEventListener("drop", handleDrop);
+      });
+
+      document.querySelectorAll(".add-card-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.getElementById("dealStage").value = btn.dataset.stage;
+          sidebar.classList.add("active");
+        });
+      });
+    }
+
+    function handleDragStart(e) {
+      draggedElement = e.target;
+      sourceStage = e.target.dataset.stage;
+      draggedIndex = parseInt(e.target.dataset.index);
+      e.target.classList.add("dragging");
+    }
+
+    function handleDragEnd(e) {
+      e.target.classList.remove("dragging");
+      document.querySelectorAll(".pipeline-column").forEach(col => {
+        col.classList.remove("drop-target");
+      });
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      return false;
+    }
+
+    function handleDragEnter(e) {
+      if (e.currentTarget.classList.contains("cards-container")) {
+        e.currentTarget.closest(".pipeline-column").classList.add("drop-target");
+      }
+    }
+
+    function handleDragLeave(e) {
+      if (e.currentTarget.classList.contains("cards-container")) {
+        e.currentTarget.closest(".pipeline-column").classList.remove("drop-target");
+      }
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const targetContainer = e.currentTarget;
+      const targetColumn = targetContainer.closest(".pipeline-column");
+      const targetStage = targetColumn.dataset.stage;
+
+      if (sourceStage !== targetStage) {
+        const deal = deals[sourceStage][draggedIndex];
+        deals[sourceStage].splice(draggedIndex, 1);
+        deals[targetStage].push(deal);
+        renderPipeline();
+      }
+
+      targetColumn.classList.remove("drop-target");
+      return false;
+    }
+
+    addBtn.onclick = () => sidebar.classList.add("active");
+    closeBtn.onclick = () => sidebar.classList.remove("active");
+
+    dealForm.addEventListener("submit", e => {
+      e.preventDefault();
+      const title = document.getElementById("dealTitle").value;
+      const customer = document.getElementById("customerName").value;
+      const id = document.getElementById("dealId").value;
+      const stage = document.getElementById("dealStage").value;
+      deals[stage].push({ title, customer, id });
+      renderPipeline();
+      sidebar.classList.remove("active");
+      dealForm.reset();
+    });
+
+    renderPipeline();
+  }
+
+  /* ====== CUSTOMERS LOGIC ====== */
+  function initCustomers() {
+    const customers = [
+      { id: "C0001", name: "John Doe", email: "john@techcorp.com", phone: "+62 812-3456-7890", history: 12, total: 15, amount: "$125,000", status: "Active" },
+      { id: "C0002", name: "Jane Smith", email: "jane@digital.com", phone: "+62 813-4567-8901", history: 8, total: 10, amount: "$87,500", status: "Active" },
+      { id: "C0003", name: "Bob Johnson", email: "bob@marketing.com", phone: "+62 814-5678-9012", history: 5, total: 7, amount: "$52,300", status: "Pending" },
+      { id: "C0004", name: "Alice Brown", email: "alice@sales.com", phone: "+62 815-6789-0123", history: 15, total: 18, amount: "$156,800", status: "Active" },
+      { id: "C0005", name: "Charlie Wilson", email: "charlie@consulting.com", phone: "+62 816-7890-1234", history: 3, total: 4, amount: "$28,900", status: "Inactive" },
+      { id: "C0006", name: "Diana Prince", email: "diana@enterprise.com", phone: "+62 817-8901-2345", history: 20, total: 25, amount: "$210,500", status: "Active" }
+    ];
+
+    const transactions = [
+      { orderId: "20001", customerId: "C0001", transactionId: "TXN001", productId: "P002", productName: "Masking 2\" Tape", quantity: 5, unitPrice: 4.5, subtotal: 22.5 },
+      { orderId: "20002", customerId: "C0001", transactionId: "TXN001", productId: "P003", productName: "EcoSeal Tape", quantity: 3, unitPrice: 6.0, subtotal: 18.0 },
+      { orderId: "20003", customerId: "C0002", transactionId: "TXN002", productId: "P004", productName: "Masking 2\" Tape", quantity: 10, unitPrice: 4.5, subtotal: 45.0 },
+      { orderId: "20004", customerId: "C0002", transactionId: "TXN002", productId: "P005", productName: "EcoSeal Tape", quantity: 2, unitPrice: 6.0, subtotal: 12.0 },
+      { orderId: "20005", customerId: "C0003", transactionId: "TXN003", productId: "P006", productName: "PowerBond Hitam", quantity: 8, unitPrice: 5.5, subtotal: 44.0 },
+      { orderId: "20006", customerId: "C0004", transactionId: "TXN004", productId: "P007", productName: "Masking 2\" Tape", quantity: 15, unitPrice: 4.5, subtotal: 67.5 },
+      { orderId: "20007", customerId: "C0004", transactionId: "TXN004", productId: "P008", productName: "EcoSeal Tape", quantity: 4, unitPrice: 6.0, subtotal: 24.0 },
+      { orderId: "20008", customerId: "C0005", transactionId: "TXN005", productId: "P009", productName: "PowerBond Hitam", quantity: 6, unitPrice: 5.5, subtotal: 33.0 }
+    ];
+
+    const sidebar = document.getElementById("customerSidebar");
+    const customerForm = document.getElementById("customerForm");
+    const addBtn = document.getElementById("addCustomerBtn");
+    const closeBtn = document.getElementById("closeCustomerSidebar");
+    const cancelBtn = document.getElementById("cancelCustomerBtn");
+    const tableBody = document.getElementById("customersTableBody");
+    const transactionBody = document.getElementById("transactionTableBody");
+    
+    let editingCustomerId = null;
+
+    function renderCustomers() {
+      tableBody.innerHTML = "";
+      customers.forEach(customer => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${customer.id}</td>
+          <td>${customer.name}</td>
+          <td>${customer.history}</td>
+          <td>${customer.total}</td>
+          <td>${customer.amount}</td>
+          <td><span style="padding:4px 8px;border-radius:12px;font-size:11px;background:${customer.status === 'Active' ? '#28a745' : customer.status === 'Pending' ? '#ffc107' : '#dc3545'};color:#fff;">${customer.status}</span></td>
+          <td>
+            <button onclick="editCustomer('${customer.id}')" style="background:#007bff;color:#fff;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;margin-right:5px;font-size:11px;">Edit</button>
+            <button onclick="deleteCustomer('${customer.id}')" style="background:#dc3545;color:#fff;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;font-size:11px;">Delete</button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    function renderTransactions() {
+      transactionBody.innerHTML = "";
+      transactions.forEach(transaction => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${transaction.orderId}</td>
+          <td>${transaction.customerId}</td>
+          <td>${transaction.transactionId}</td>
+          <td>${transaction.productId}</td>
+          <td>${transaction.productName}</td>
+          <td>${transaction.quantity}</td>
+          <td>${transaction.unitPrice.toFixed(2)}</td>
+          <td>${transaction.subtotal.toFixed(2)}</td>
+        `;
+        transactionBody.appendChild(row);
+      });
+    }
+
+    window.editCustomer = function(id) {
+      const customer = customers.find(c => c.id === id);
+      if (customer) {
+        editingCustomerId = id;
+        document.getElementById("custId").value = customer.id;
+        document.getElementById("custName").value = customer.name;
+        document.getElementById("custEmail").value = customer.email;
+        document.getElementById("custPhone").value = customer.phone;
+        document.getElementById("custStatus").value = customer.status;
+        document.getElementById("custId").readOnly = true;
+        document.getElementById("customerFormTitle").textContent = "Edit Customer";
+        document.getElementById("customerSubmitBtn").textContent = "Update Customer";
+        sidebar.classList.add("active");
+      }
+    };
+
+    window.deleteCustomer = function(id) {
+      if (confirm("Are you sure you want to delete this customer?")) {
+        const index = customers.findIndex(c => c.id === id);
+        if (index > -1) {
+          customers.splice(index, 1);
+          renderCustomers();
+        }
+      }
+    };
+
+    addBtn.onclick = () => {
+      editingCustomerId = null;
+      customerForm.reset();
+      document.getElementById("custId").readOnly = false;
+      document.getElementById("customerFormTitle").textContent = "Add New Customer";
+      document.getElementById("customerSubmitBtn").textContent = "Add Customer";
+      sidebar.classList.add("active");
+    };
+
+    closeBtn.onclick = () => {
+      sidebar.classList.remove("active");
+      editingCustomerId = null;
+      customerForm.reset();
+    };
+
+    cancelBtn.onclick = () => {
+      sidebar.classList.remove("active");
+      editingCustomerId = null;
+      customerForm.reset();
+    };
+
+    customerForm.addEventListener("submit", e => {
+      e.preventDefault();
+      const id = document.getElementById("custId").value;
+      const name = document.getElementById("custName").value;
+      const email = document.getElementById("custEmail").value;
+      const phone = document.getElementById("custPhone").value;
+      const status = document.getElementById("custStatus").value;
+
+      if (editingCustomerId) {
+        const customer = customers.find(c => c.id === editingCustomerId);
+        if (customer) {
+          customer.name = name;
+          customer.email = email;
+          customer.phone = phone;
+          customer.status = status;
+        }
+      } else {
+        customers.push({ 
+          id, 
+          name, 
+          email, 
+          phone, 
+          history: 0, 
+          total: 0, 
+          amount: "$0", 
+          status 
+        });
+      }
+
+      renderCustomers();
+      sidebar.classList.remove("active");
+      editingCustomerId = null;
+      customerForm.reset();
+    });
+
+    renderCustomers();
+    renderTransactions();
+  }
+
+  /* ====== ANALYTICS LOGIC ====== */
+  function initAnalytics() {
+    // Add interactivity to performance cards
+    document.querySelectorAll('.performance-card').forEach(card => {
+      card.addEventListener('click', function() {
+        const title = this.querySelector('.performance-title').textContent;
+        const value = this.querySelector('.performance-value').textContent;
+        alert(`${title}: ${value}`);
+      });
+    });
+
+    // Add interactivity to pipeline stages
+    document.querySelectorAll('.pipeline-stage').forEach(stage => {
+      stage.addEventListener('click', function() {
+        const name = this.querySelector('.pipeline-stage-name').textContent;
+        alert(`${name} Stage clicked`);
+      });
+    });
+  }
+
+  checkLogin();
+});
+</script>
+</body>
+</html>
