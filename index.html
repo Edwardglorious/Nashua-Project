@@ -3,56 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel</title>
+    <title>Nashua CRM Dashboard</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <main id="login-view">
-        <div class="login-container">
-            <form id="login-form">
-                <h2>Admin Login</h2>
-                <div class="input-group">
-                    <label for="username">Email atau Username</label>
-                    <input type="text" id="username" name="username" required>
-                </div>
-                <div class="input-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required>
-                </div>
-                <button type="submit">Log In</button>
-                <p id="error-message"></p>
-            </form>
-        </div>
-    </main>
-
-    <main id="dashboard-view" class="hidden">
-        
-        <header class="top-bar">
-            <div class="logo">
-                Nashua
-                <span class="subtext">INDUSTRIAL ADHESIVE TAPE</span>
+<!-- LOGIN VIEW -->
+<main id="login-view">
+    <div class="login-container">
+        <form id="login-form">
+            <h2>Admin Login</h2>
+            <div class="input-group">
+                <label for="username">Email atau Username</label>
+                <input type="text" id="username" required>
             </div>
-            <a href="#" id="logout-link" class="login-link">Log Out</a>
-        </header>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required>
+            </div>
+            <button type="submit">Log In</button>
+            <p id="error-message"></p>
+        </form>
+    </div>
+</main>
 
-        <nav class="main-nav">
-            <ul>
-                <li><a href="#" class="active">Dashboard</a></li>
-                <li><a href="#">Customers</a></li>
-                <li><a href="#">Sales Pipeline</a></li>
-                <li><a href="#">Order and Invoices</a></li>
-                <li><a href="#">Analytics & Reports</a></li>
-            </ul>
-        </nav>
-
-        <div class="content-area">
-            <h1>Welcome to the Dashboard</h1>
-            <p>This is the main content area.</p>
-            <p>Pilih menu di atas untuk navigasi.</p>
+<!-- DASHBOARD VIEW -->
+<main id="dashboard-view" class="hidden">
+    <header class="top-bar">
+        <div class="logo">
+            Nashua
+            <span class="subtext">INDUSTRIAL ADHESIVE TAPE</span>
         </div>
-    </main>
+        <a href="#" id="logout-link" class="login-link">Log Out</a>
+    </header>
 
-    <script src="app.js"></script>
+    <nav class="main-nav">
+        <ul>
+            <li><a href="#" class="active" data-page="dashboard">Dashboard</a></li>
+            <li><a href="#" data-page="customers">Customers</a></li>
+            <li><a href="#" data-page="sales">Sales Pipeline</a></li>
+            <li><a href="#" data-page="orders">Order and Invoices</a></li>
+            <li><a href="#" data-page="reports">Analytics & Reports</a></li>
+        </ul>
+    </nav>
+
+    <div class="content-area" id="content-area">
+        <h1>Selamat Datang di Dashboard</h1>
+        <p>Ini adalah area konten utama.</p>
+        <p>Pilih menu di atas untuk navigasi.</p>
+    </div>
+</main>
+
+<script src="app.js"></script>
 </body>
 </html>

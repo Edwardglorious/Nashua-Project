@@ -1,19 +1,23 @@
+/* ========== GLOBAL STYLE ========== */
 body, html {
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
     background-color: #f0f0f0; 
+    color: #333;
 }
 
 .hidden {
     display: none !important;
 }
 
+/* ========== LOGIN VIEW ========== */
 #login-view {
     display: flex;
     align-items: center;
     justify-content: center;
     min-height: 100vh;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d1f1f 100%);
 }
 
 .login-container {
@@ -46,7 +50,7 @@ body, html {
     padding: 0.75rem;
     border: 1px solid #ccc;
     border-radius: 4px;
-    box-sizing: border-box; /* Memastikan padding tidak merusak lebar */
+    box-sizing: border-box;
 }
 
 .login-container button {
@@ -54,7 +58,7 @@ body, html {
     padding: 0.75rem;
     border: none;
     border-radius: 4px;
-    background-color: #c00; /* Warna merah agar serasi */
+    background-color: #c00;
     color: white;
     font-size: 1rem;
     font-weight: bold;
@@ -73,6 +77,7 @@ body, html {
     min-height: 1.2em;
 }
 
+/* ========== DASHBOARD HEADER ========== */
 .top-bar {
     background: linear-gradient(90deg, rgba(50,0,0,1) 0%, rgba(150,0,0,1) 70%, rgba(204,0,0,1) 100%);
     display: flex;
@@ -109,6 +114,7 @@ body, html {
     color: #ddd; 
 }
 
+/* ========== NAVIGATION BAR ========== */
 .main-nav {
     background-color: #333;
     padding: 12px 20px;
@@ -121,10 +127,6 @@ body, html {
     list-style: none;
     display: flex;
     gap: 25px;
-}
-
-.main-nav li {
-    display: inline-block;
 }
 
 .main-nav a {
@@ -140,7 +142,246 @@ body, html {
     color: #fff;
 }
 
+/* ========== CONTENT AREA ========== */
 .content-area {
     padding: 2rem;
     color: #333;
+}
+
+/* ========== CUSTOMER PAGE ========== */
+.customers-wrapper {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d1f1f 100%);
+    color: #fff;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* SECTION STYLE */
+.section {
+    background: linear-gradient(135deg, rgba(80, 30, 30, 0.4) 0%, rgba(60, 20, 20, 0.6) 100%);
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.section-title {
+    font-size: 22px;
+    font-weight: 600;
+}
+
+/* BUTTONS */
+.add-btn {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ff4757 100%);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3);
+    transition: all 0.3s;
+}
+
+.add-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 71, 87, 0.4);
+}
+
+.close-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 8px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 13px;
+}
+
+.close-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* ADD/EDIT CUSTOMER FORM */
+.customer-form {
+    max-width: 800px;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-label {
+    display: block;
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    color: #fff;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px 20px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 25px;
+    font-size: 15px;
+    color: #333;
+    transition: all 0.3s;
+}
+
+.form-input:focus {
+    outline: none;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(255, 102, 102, 0.3);
+}
+
+.form-textarea {
+    border-radius: 15px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.submit-btn {
+    flex: 1;
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 15px;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    transition: all 0.3s;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+}
+
+.cancel-btn {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 12px 25px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 15px;
+    transition: all 0.3s;
+}
+
+.cancel-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* TABLE STYLE */
+.table-container {
+    overflow-x: auto;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    padding: 15px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    color: #fff;
+}
+
+th {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 12px 8px;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 2px solid #ff0066;
+    white-space: nowrap;
+}
+
+td {
+    padding: 10px 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+tr:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* STATUS BADGES */
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.status-completed { background: #27ae60; }
+.status-pending { background: #f39c12; }
+.status-ongoing { background: #3498db; }
+
+/* ========== SMALL BUTTONS (EDIT & DELETE) ========== */
+.small-btn {
+    padding: 5px 8px;
+    font-size: 11px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #fff;
+    margin: 0 2px;
+}
+
+.edit-btn {
+    background-color: #3498db;
+}
+.edit-btn:hover {
+    background-color: #2980b9;
+}
+
+.delete-btn {
+    background-color: #e74c3c;
+}
+.delete-btn:hover {
+    background-color: #c0392b;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .section {
+        padding: 15px;
+    }
+    .form-input {
+        padding: 10px 15px;
+    }
+    .submit-btn, .cancel-btn {
+        font-size: 13px;
+        padding: 10px 20px;
+    }
+    th, td {
+        font-size: 11px;
+    }
+    .small-btn {
+        font-size: 10px;
+        padding: 4px 6px;
+    }
 }
