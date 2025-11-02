@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nashua CRM Dashboard</title>
+    <title>Nashua Customer</title>
     <style>
         * {
             margin: 0;
@@ -373,61 +373,6 @@
                             <td>22</td>
                             <td>45,000</td>
                         </tr>
-                        <tr>
-                            <td>CU0004</td>
-                            <td>Eva Brown</td>
-                            <td>Volkswagen</td>
-                            <td>Germany</td>
-                            <td>Automotive</td>
-                            <td>+49 5361 9091 01</td>
-                            <td>Europe</td>
-                            <td>18</td>
-                            <td>32,000</td>
-                        </tr>
-                        <tr>
-                            <td>CU0005</td>
-                            <td>Emily Zhang</td>
-                            <td>China</td>
-                            <td>China</td>
-                            <td>Value Tech</td>
-                            <td>+86 135 9999 2345</td>
-                            <td>Middle East & Africa</td>
-                            <td>7</td>
-                            <td>8,800</td>
-                        </tr>
-                        <tr>
-                            <td>CU0006</td>
-                            <td>Fatima Ahmed</td>
-                            <td>Riyadh</td>
-                            <td>Saudi Arabia</td>
-                            <td>Oil & Gas</td>
-                            <td>+966 11 2110 010</td>
-                            <td>Middle East</td>
-                            <td>12</td>
-                            <td>28,500</td>
-                        </tr>
-                        <tr>
-                            <td>CU0007</td>
-                            <td>Carlos Silva</td>
-                            <td>Brazil</td>
-                            <td>Brazil</td>
-                            <td>Agriculture</td>
-                            <td>+55 11 3040 7000</td>
-                            <td>Latin America</td>
-                            <td>9</td>
-                            <td>12,300</td>
-                        </tr>
-                        <tr>
-                            <td>CU0008</td>
-                            <td>Hans Schmidt</td>
-                            <td>Aeudi</td>
-                            <td>Germany</td>
-                            <td>Design</td>
-                            <td>+49 841 8901 0</td>
-                            <td>Europe</td>
-                            <td>14</td>
-                            <td>19,800</td>
-                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -472,46 +417,6 @@
                             <td>2025-10-14</td>
                             <td>Bank Transfer</td>
                             <td>3,200</td>
-                            <td><span class="status-badge status-pending">Pending</span></td>
-                        </tr>
-                        <tr>
-                            <td>TX0004</td>
-                            <td>CU0004</td>
-                            <td>2025-10-13</td>
-                            <td>Credit Card</td>
-                            <td>890</td>
-                            <td><span class="status-badge status-completed">Completed</span></td>
-                        </tr>
-                        <tr>
-                            <td>TX0005</td>
-                            <td>CU0005</td>
-                            <td>2025-10-12</td>
-                            <td>Credit Card</td>
-                            <td>445</td>
-                            <td><span class="status-badge status-ongoing">Ongoing</span></td>
-                        </tr>
-                        <tr>
-                            <td>TX0006</td>
-                            <td>CU0006</td>
-                            <td>2025-10-12</td>
-                            <td>PayPal</td>
-                            <td>2,150</td>
-                            <td><span class="status-badge status-completed">Completed</span></td>
-                        </tr>
-                        <tr>
-                            <td>TX0007</td>
-                            <td>CU0007</td>
-                            <td>2025-10-11</td>
-                            <td>Bank Transfer</td>
-                            <td>1,890</td>
-                            <td><span class="status-badge status-completed">Completed</span></td>
-                        </tr>
-                        <tr>
-                            <td>TX0008</td>
-                            <td>CU0008</td>
-                            <td>2025-10-10</td>
-                            <td>Cash</td>
-                            <td>320</td>
                             <td><span class="status-badge status-pending">Pending</span></td>
                         </tr>
                     </tbody>
@@ -559,42 +464,6 @@
                             <td>6</td>
                             <td>18</td>
                         </tr>
-                        <tr>
-                            <td>D004</td>
-                            <td>TX0003</td>
-                            <td>P002</td>
-                            <td>MegaStick 2" Tape</td>
-                            <td>3</td>
-                            <td>4.5</td>
-                            <td>13.5</td>
-                        </tr>
-                        <tr>
-                            <td>D005</td>
-                            <td>TX0003</td>
-                            <td>P004</td>
-                            <td>EcoGrip Tape</td>
-                            <td>5</td>
-                            <td>4.3</td>
-                            <td>21.5</td>
-                        </tr>
-                        <tr>
-                            <td>D006</td>
-                            <td>TX0004</td>
-                            <td>P001</td>
-                            <td>UltraGrip 2" Tape</td>
-                            <td>3</td>
-                            <td>4</td>
-                            <td>12</td>
-                        </tr>
-                        <tr>
-                            <td>D007</td>
-                            <td>TX0004</td>
-                            <td>P002</td>
-                            <td>MegaStick 2" Tape</td>
-                            <td>2</td>
-                            <td>5</td>
-                            <td>10</td>
-                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -602,26 +471,112 @@
     </div>
 
     <script>
+        // Store customers with persistent database
+        let customers = [];
+        let customerCounter = 9;
+
+        // Load all customers from database on page load
+        async function loadCustomers() {
+            try {
+                const result = await window.storage.get('customers-data');
+                if (result && result.value) {
+                    const data = JSON.parse(result.value);
+                    customers = data.customers || [];
+                    customerCounter = data.counter || 9;
+                    
+                    // Display saved customers in table
+                    customers.forEach(customer => {
+                        addCustomerToTable(customer, false);
+                    });
+                    console.log('✅ Loaded customers from database:', customers.length);
+                }
+            } catch (error) {
+                console.log('ℹ️ No existing customer data found, starting fresh');
+            }
+        }
+
+        // Save all customers to database
+        async function saveCustomers() {
+            try {
+                const data = {
+                    customers: customers,
+                    counter: customerCounter
+                };
+                await window.storage.set('customers-data', JSON.stringify(data));
+                console.log('✅ Saved to database:', customers.length, 'customers');
+            } catch (error) {
+                console.error('❌ Failed to save:', error);
+                alert('Failed to save customer to database');
+            }
+        }
+
         function showAddForm() {
             document.getElementById('addCustomerForm').style.display = 'block';
             document.getElementById('customerListSection').style.display = 'none';
-            document.querySelectorAll('.section')[2].style.display = 'none'; // Hide transaction history
+            document.querySelectorAll('.section')[2].style.display = 'none';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function hideAddForm() {
             document.getElementById('addCustomerForm').style.display = 'none';
             document.getElementById('customerListSection').style.display = 'block';
-            document.querySelectorAll('.section')[2].style.display = 'block'; // Show transaction history
+            document.querySelectorAll('.section')[2].style.display = 'block';
+        }
+
+        function addCustomerToTable(customer, highlight = true) {
+            const tbody = document.querySelector('#customerListSection tbody');
+            const row = tbody.insertRow(0);
+            
+            row.innerHTML = `
+                <td>${customer.id}</td>
+                <td>${customer.name}</td>
+                <td>${customer.company}</td>
+                <td>${customer.nationality}</td>
+                <td>${customer.category || 'N/A'}</td>
+                <td>${customer.contact}</td>
+                <td>${customer.region}</td>
+                <td>0</td>
+                <td>0</td>
+            `;
+            
+            if (highlight) {
+                row.style.background = 'rgba(40, 167, 69, 0.2)';
+                setTimeout(() => {
+                    row.style.background = '';
+                }, 2000);
+            }
         }
 
         // Handle form submission
-        document.querySelector('.customer-form').addEventListener('submit', function(e) {
+        document.querySelector('.customer-form').addEventListener('submit', async function(e) {
             e.preventDefault();
-            alert('Customer added successfully!');
+            
+            const customer = {
+                id: `CU${String(customerCounter).padStart(4, '0')}`,
+                name: this.querySelector('input[placeholder="Required"]').value,
+                company: this.querySelector('input[placeholder="must be a valid company"]').value,
+                nationality: this.querySelectorAll('input[placeholder="Required"]')[1].value,
+                region: this.querySelectorAll('input[placeholder="Required"]')[2].value,
+                contact: this.querySelector('input[type="tel"]').value,
+                notes: this.querySelector('textarea').value
+            };
+            
+            customerCounter++;
+            customers.push(customer);
+            
+            // Save to database
+            await saveCustomers();
+            
+            // Add to table
+            addCustomerToTable(customer);
+            
+            alert('✅ Customer saved to database successfully!');
             hideAddForm();
             this.reset();
         });
+
+        // Load customers when page loads
+        window.addEventListener('DOMContentLoaded', loadCustomers);
     </script>
 </body>
-</html>
+</html> 
