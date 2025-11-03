@@ -942,7 +942,7 @@ function initAnalytics() {
     addProductBtn.onclick = () => {
       editingProductId = null; // Pastikan mode "Add New"
       productForm.reset();
-      const newId = `P4P${String(products.length + 1).padStart(2, '0')}`;
+      const newId = `P4P${String(products.length + 1).padStart(1, '0')}`;
       document.getElementById("productId").value = newId;
       document.querySelector("#productSidebar .sidebar-header h2").textContent = "Add New Product";
       document.querySelector("#productSidebar .submit-btn").textContent = "Add Product";
