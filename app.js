@@ -1,3 +1,131 @@
+// --- BAGIAN TEMPLATE ---
+// Menambahkan ID pada kartu-kartu di dashboardTemplate
+const dashboardTemplate = `
+<div class="analytics-dashboard">
+  
+  <div class="card" id="card-top-customers" style="cursor: pointer;">
+    <div class="card-header">Top 10 Customers</div>
+    <table class="customers-table">
+      <thead>
+        <tr>
+          <th>Customer_ID</th>
+          <th>Customer</th>
+          <th>Total_Transaction</th>
+          <th>Total_Amount (USD)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>C0001</td><td>Alex Tan</td><td>15</td><td>9,500</td></tr>
+        <tr><td>C0002</td><td>Benjamin Lee</td><td>12</td><td>8,200</td></tr>
+        <tr><td>C0003</td><td>Catherine Wong</td><td>10</td><td>7,800</td></tr>
+        <tr><td>C0004</td><td>David Chen</td><td>9</td><td>6,900</td></tr>
+        <tr><td>C0005</td><td>Emily Zhang</td><td>8</td><td>6,450</td></tr>
+        <tr><td>C0006</td><td>Frank Yusuf</td><td>22</td><td>15,600</td></tr>
+        <tr><td>C0007</td><td>Grace Kim</td><td>18</td><td>12,300</td></tr>
+        <tr><td>C0008</td><td>Henry Gunawan</td><td>14</td><td>9,800</td></tr>
+        <tr><td>C0009</td><td>Irene Susilo</td><td>11</td><td>7,500</td></tr>
+        <tr><td>C0010</td><td>Jason Hartono</td><td>25</td><td>18,900</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card" id="card-performance-summary" style="cursor: pointer;">
+    <div class="card-header">Performance Summary</div>
+    <div class="performance-grid">
+      <div class="performance-card">
+        <div class="performance-title">Monthly Total Sales</div>
+        <div class="performance-value">$285k</div>
+      </div>
+      <div class="performance-card">
+        <div class="performance-title">Lead Conversion Rate</div>
+        <div class="performance-value">68%</div>
+      </div>
+      <div class="performance-card">
+        <div class="performance-title">Monthly Deal Closed</div>
+        <div class="performance-value">47</div>
+      </div>
+      <div class="performance-card">
+        <div class="performance-title">Qualified Leads</div>
+        <div class="performance-value">156</div>
+      </div>
+      <div class="performance-card">
+        <div class="performance-title">Sales Closed</div>
+        <div class="performance-value">234</div>
+      </div>
+      <div class="performance-card">
+        <div class="performance-title">Monthly sold units</div>
+        <div class="performance-value">1,847</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="card-pending-followup" style="cursor: pointer;">
+    <div class="card-header">Pending Follow Up</div>
+    <table class="followup-table">
+      <thead>
+        <tr>
+          <th>Transaction_ID</th>
+          <th>Customer_ID</th>
+          <th>Transaction_Date</th>
+          <th>Payment_Method</th>
+          <th>Est_Amount (USD)</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>TXN045</td><td>C1205</td><td>2025-11-05</td><td>Bank Transfer</td><td>5,200</td><td>Pending</td></tr>
+        <tr><td>TXN046</td><td>C1208</td><td>2025-11-06</td><td>Credit Card</td><td>3,800</td><td>Pending</td></tr>
+        <tr><td>TXN047</td><td>C1212</td><td>2025-11-08</td><td>PayPal</td><td>4,500</td><td>Pending</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card" id="card-newest-order" style="cursor: pointer;">
+    <div class="card-header">Newest Order</div>
+    <table class="order-table">
+      <thead>
+        <tr>
+          <th>Order_ID</th>
+          <th>Customer_ID</th>
+          <th>Transaction_ID</th>
+          <th>Product_Name</th>
+          <th>Quantity</th>
+          <th>Total_Price</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>20547</td><td>C0089</td><td>TXN547</td><td>EcoSeal Tape</td><td>15</td><td>$675</td><td>Nov 2</td></tr>
+        <tr><td>20546</td><td>C0072</td><td>TXN546</td><td>Masking 2" Tape</td><td>25</td><td>$1,125</td><td>Nov 1</td></tr>
+        <tr><td>20545</td><td>C0055</td><td>TXN545</td><td>PowerBond Hitam</td><td>10</td><td>$550</td><td>Oct 31</td></tr>
+        <tr><td>20544</td><td>C0041</td><td>TXN544</td><td>Double Sided Tape</td><td>30</td><td>$1,800</td><td>Oct 30</td></tr>
+        <tr><td>20543</td><td>C0033</td><td>TXN543</td><td>Clear Packing Tape</td><td>50</td><td>$2,250</td><td>Oct 29</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card" style="grid-column: 1 / -1;">
+    <div class="card-header">Sales Pipeline Overview</div>
+    <div class="pipeline-overview">
+      <div class="pipeline-stage">
+        <div class="pipeline-stage-name">Lead</div>
+      </div>
+      <div class="pipeline-stage">
+        <div class="pipeline-stage-name">Qualification</div>
+      </div>
+      <div class="pipeline-stage">
+        <div class="pipeline-stage-name">Proposal</div>
+      </div>
+      <div class="pipeline-stage">
+        <div class="pipeline-stage-name">Negotiation</div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+// --- AKHIR BAGIAN TEMPLATE ---
+
+
 const loginView = document.getElementById("login-view");
 const dashboardView = document.getElementById("dashboard-view");
 const loginForm = document.getElementById("login-form");
@@ -71,130 +199,7 @@ let products = [
   { id: "P4P11", name: "Nashua Top1 Fragile Tape (48mm x 66m)", category: "Warning Tape", price: 22000, supply: "Active", stock: "Active", width: 48, length: 66, rating: 4.8 },
 ];
 
-/* ===== HTML TEMPLATES FOR DYNAMIC CONTENT ===== */
-
-const dashboardTemplate = `
-<div class="analytics-dashboard">
-  <div class="card">
-    <div class="card-header">Top 10 Customers</div>
-    <table class="customers-table">
-      <thead>
-        <tr>
-          <th>Customer_ID</th>
-          <th>Customer</th>
-          <th>Total_Transaction</th>
-          <th>Total_Amount (USD)</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>C0001</td><td>Alex Tan</td><td>15</td><td>9,500</td></tr>
-        <tr><td>C0002</td><td>Benjamin Lee</td><td>12</td><td>8,200</td></tr>
-        <tr><td>C0003</td><td>Catherine Wong</td><td>10</td><td>7,800</td></tr>
-        <tr><td>C0004</td><td>David Chen</td><td>9</td><td>6,900</td></tr>
-        <tr><td>C0005</td><td>Emily Zhang</td><td>8</td><td>6,450</td></tr>
-        <tr><td>C0006</td><td>Frank Yusuf</td><td>22</td><td>15,600</td></tr>
-        <tr><td>C0007</td><td>Grace Kim</td><td>18</td><td>12,300</td></tr>
-        <tr><td>C0008</td><td>Henry Gunawan</td><td>14</td><td>9,800</td></tr>
-        <tr><td>C0009</td><td>Irene Susilo</td><td>11</td><td>7,500</td></tr>
-        <tr><td>C0010</td><td>Jason Hartono</td><td>25</td><td>18,900</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="card">
-    <div class="card-header">Performance Summary</div>
-    <div class="performance-grid">
-      <div class="performance-card">
-        <div class="performance-title">Monthly Total Sales</div>
-        <div class="performance-value">$285k</div>
-      </div>
-      <div class="performance-card">
-        <div class="performance-title">Lead Conversion Rate</div>
-        <div class="performance-value">68%</div>
-      </div>
-      <div class="performance-card">
-        <div class="performance-title">Monthly Deal Closed</div>
-        <div class="performance-value">47</div>
-      </div>
-      <div class="performance-card">
-        <div class="performance-title">Qualified Leads</div>
-        <div class="performance-value">156</div>
-      </div>
-      <div class="performance-card">
-        <div class="performance-title">Sales Closed</div>
-        <div class="performance-value">234</div>
-      </div>
-      <div class="performance-card">
-        <div class="performance-title">Monthly sold units</div>
-        <div class="performance-value">1,847</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-header">Pending Follow Up</div>
-    <table class="followup-table">
-      <thead>
-        <tr>
-          <th>Transaction_ID</th>
-          <th>Customer_ID</th>
-          <th>Transaction_Date</th>
-          <th>Payment_Method</th>
-          <th>Est_Amount (USD)</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>TXN045</td><td>C1205</td><td>2025-11-05</td><td>Bank Transfer</td><td>5,200</td><td>Pending</td></tr>
-        <tr><td>TXN046</td><td>C1208</td><td>2025-11-06</td><td>Credit Card</td><td>3,800</td><td>Pending</td></tr>
-        <tr><td>TXN047</td><td>C1212</td><td>2025-11-08</td><td>PayPal</td><td>4,500</td><td>Pending</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="card">
-    <div class="card-header">Newest Order</div>
-    <table class="order-table">
-      <thead>
-        <tr>
-          <th>Order_ID</th>
-          <th>Customer_ID</th>
-          <th>Transaction_ID</th>
-          <th>Product_Name</th>
-          <th>Quantity</th>
-          <th>Total_Price</th>
-          <th>Date</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>20547</td><td>C0089</td><td>TXN547</td><td>EcoSeal Tape</td><td>15</td><td>$675</td><td>Nov 2</td></tr>
-        <tr><td>20546</td><td>C0072</td><td>TXN546</td><td>Masking 2" Tape</td><td>25</td><td>$1,125</td><td>Nov 1</td></tr>
-        <tr><td>20545</td><td>C0055</td><td>TXN545</td><td>PowerBond Hitam</td><td>10</td><td>$550</td><td>Oct 31</td></tr>
-        <tr><td>20544</td><td>C0041</td><td>TXN544</td><td>Double Sided Tape</td><td>30</td><td>$1,800</td><td>Oct 30</td></tr>
-        <tr><td>20543</td><td>C0033</td><td>TXN543</td><td>Clear Packing Tape</td><td>50</td><td>$2,250</td><td>Oct 29</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="card" style="grid-column: 1 / -1;">
-    <div class="card-header">Sales Pipeline Overview</div>
-    <div class="pipeline-overview">
-      <div class="pipeline-stage">
-        <div class="pipeline-stage-name">Lead</div>
-      </div>
-      <div class="pipeline-stage">
-        <div class="pipeline-stage-name">Qualification</div>
-      </div>
-      <div class="pipeline-stage">
-        <div class="pipeline-stage-name">Proposal</div>
-      </div>
-      <div class="pipeline-stage">
-        <div class="pipeline-stage-name">Negotiation</div>
-      </div>
-    </div>
-  </div>
-</div>
-`;
+/* ===== HTML TEMPLATES (Sisa template tidak berubah) ===== */
 
 const customersTemplate = `
 <div class="customers-wrapper">
@@ -409,7 +414,7 @@ const analyticsTemplate = `
 </div>
 `;
 
-// --- Template untuk Halaman Orders & Invoices (Recent Invoices Dihapus) ---
+// Template untuk Halaman Orders & Invoices (Recent Invoices Dihapus)
 const ordersTemplate = `
 <div class="summary-cards">
   <div class="summary-card">
@@ -571,60 +576,98 @@ logoutBtn.addEventListener("click", (e) => {
   checkLogin();
 });
 
-/* === NAVIGATION === */
+// --- PERUBAHAN: FUNGSI NAVIGASI TERPUSAT ---
+/**
+ * Menangani navigasi halaman SPA
+ * @param {string} page - Nama halaman (mis: 'dashboard', 'customers', 'sales', dll.)
+ */
+function navigateTo(page) {
+  // 1. Update kelas 'active' di menu navigasi atas
+  navLinks.forEach((l) => l.classList.remove("active"));
+  const activeLink = document.querySelector(`.main-nav a[data-page='${page}']`);
+  if (activeLink) {
+    activeLink.classList.add("active");
+  }
+
+  // 2. Muat konten halaman dan panggil fungsi init-nya
+  if (page === "sales") {
+    contentArea.innerHTML = pipelineTemplate;
+    initPipeline();
+  } else if (page === "reports") {
+    contentArea.innerHTML = analyticsTemplate;
+    initAnalytics();
+  } else if (page === "customers") {
+    contentArea.innerHTML = customersTemplate;
+    initCustomers();
+  } else if (page === "orders") {
+    contentArea.innerHTML = ordersTemplate;
+    initOrders();
+  } else { // Halaman default adalah dashboard
+    contentArea.innerHTML = dashboardTemplate;
+    initDashboard();
+  }
+}
+// --- AKHIR PERUBAHAN ---
+
+
+/* === NAVIGATION (diperbarui) === */
 navLinks.forEach((link) => {
   link.addEventListener("click", (e) => {
     e.preventDefault();
-    navLinks.forEach((l) => l.classList.remove("active"));
-    link.classList.add("active");
-
     const page = link.getAttribute("data-page");
-
-    if (page === "sales") {
-      contentArea.innerHTML = pipelineTemplate;
-      initPipeline();
-    } else if (page === "reports") {
-      contentArea.innerHTML = analyticsTemplate;
-      initAnalytics();
-    } else if (page === "customers") {
-      contentArea.innerHTML = customersTemplate;
-      initCustomers();
-    } else if (page === "orders") {
-      // --- BARU: Menambahkan case untuk 'orders' ---
-      contentArea.innerHTML = ordersTemplate;
-      initOrders();
-    } else {
-      contentArea.innerHTML = dashboardTemplate;
-      initDashboard();
-    }
+    // --- PERUBAHAN: Memanggil fungsi navigasi terpusat ---
+    navigateTo(page);
+    // --- AKHIR PERUBAHAN ---
   });
 });
 
-/* ====== DASHBOARD LOGIC ====== */
+/* ====== DASHBOARD LOGIC (diperbarui) ====== */
 function initDashboard() {
-  const perfCards = document.querySelectorAll(".performance-card");
-  if (perfCards.length > 0) {
-    perfCards.forEach((card) => {
-      card.addEventListener("click", function () {
-        const title = this.querySelector(".performance-title").textContent;
-        const value = this.querySelector(".performance-value").textContent;
-        alert(title + ": " + value);
-      });
-    });
+  
+  // --- PERUBAHAN: Menambahkan listener untuk kartu dashboard ---
+  
+  // 1. Kartu Top 10 Customers
+  const customerCard = document.getElementById("card-top-customers");
+  if (customerCard) {
+    customerCard.addEventListener("click", () => navigateTo("customers"));
   }
 
-  const pipelineStages = document.querySelectorAll(".pipeline-stage");
+  // 2. Kartu Performance Summary
+  const performanceCard = document.getElementById("card-performance-summary");
+  if (performanceCard) {
+    performanceCard.addEventListener("click", () => navigateTo("reports"));
+  }
+
+  // 3. Kartu Pending Follow Up
+  const pendingCard = document.getElementById("card-pending-followup");
+  if (pendingCard) {
+    pendingCard.addEventListener("click", () => navigateTo("orders"));
+  }
+
+  // 4. Kartu Newest Order
+  const newestOrderCard = document.getElementById("card-newest-order");
+  if (newestOrderCard) {
+    newestOrderCard.addEventListener("click", () => navigateTo("orders"));
+  }
+
+  // 5. Kartu Sales Pipeline Overview (semua kotak)
+  const pipelineStages = document.querySelectorAll('.pipeline-stage');
   if (pipelineStages.length > 0) {
-    pipelineStages.forEach((stage) => {
-      stage.addEventListener("click", function () {
-        const name = this.querySelector(".pipeline-stage-name").textContent;
-        alert(name + " Stage clicked");
-      });
+    pipelineStages.forEach(stage => {
+      // Mengganti listener alert yang lama dengan navigasi
+      stage.addEventListener('click', () => navigateTo("sales"));
     });
   }
+  
+  // Catatan: Listener untuk .performance-card (unit kecil) dihapus 
+  // karena sekarang seluruh kartu .card#card-performance-summary 
+  // yang menangani klik.
+  
+  // --- AKHIR PERUBAHAN ---
 }
 
-/* ====== CUSTOMERS LOGIC ====== */
+
+/* ====== CUSTOMERS LOGIC (tidak berubah) ====== */
 function initCustomers() {
   const sidebar = document.getElementById("customerSidebar");
   const customerForm = document.getElementById("customerForm");
@@ -757,7 +800,7 @@ function initCustomers() {
   renderTransactions();
 }
 
-/* ====== ANALYTICS LOGIC ====== */
+/* ====== ANALYTICS LOGIC (tidak berubah) ====== */
 function initAnalytics() {
   // 1. Sales Report by Region - Get data from transactions
   const regionStats = {};
@@ -800,18 +843,20 @@ function initAnalytics() {
     .sort((a, b) => b.amount - a.amount);
 
   const regionTable = document.getElementById("regionTable");
-  regionTable.innerHTML = "";
-  regionData.forEach((region) => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${region.region}</td>
-      <td>${region.trans}</td>
-      <td>${region.amount.toLocaleString()}</td>
-      <td>${region.convRate}%</td>
-      <td>${region.topProduct}</td>
-    `;
-    regionTable.appendChild(row);
-  });
+  if(regionTable) {
+    regionTable.innerHTML = "";
+    regionData.forEach((region) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${region.region}</td>
+        <td>${region.trans}</td>
+        <td>${region.amount.toLocaleString()}</td>
+        <td>${region.convRate}%</td>
+        <td>${region.topProduct}</td>
+      `;
+      regionTable.appendChild(row);
+    });
+  }
 
   // 2. Sales Performance - Monthly and Quarterly
   const monthlyStats = {};
@@ -845,6 +890,8 @@ function initAnalytics() {
 
   function updatePerformanceMetrics(view) {
     const metricsDiv = document.getElementById("performanceMetrics");
+    if(!metricsDiv) return;
+    
     let data;
 
     if (view === "monthly") {
@@ -932,17 +979,19 @@ function initAnalytics() {
     .sort((a, b) => b.totalAmount - a.totalAmount);
 
   const regularTable = document.getElementById("regularCustomers");
-  regularTable.innerHTML = "";
-  regularCustomers.forEach((customer) => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${customer.id}</td>
-      <td>${customer.name}</td>
-      <td>${customer.totalTransaction}</td>
-      <td>${customer.totalAmount.toLocaleString()}</td>
-    `;
-    regularTable.appendChild(row);
-  });
+  if(regularTable) {
+    regularTable.innerHTML = "";
+    regularCustomers.forEach((customer) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${customer.id}</td>
+        <td>${customer.name}</td>
+        <td>${customer.totalTransaction}</td>
+        <td>${customer.totalAmount.toLocaleString()}</td>
+      `;
+      regularTable.appendChild(row);
+    });
+  }
 
   // Potential customers - 1 transaction with highest quantity
   const potentialMap = {};
@@ -969,26 +1018,34 @@ function initAnalytics() {
     .slice(0, 5);
 
   const potentialTable = document.getElementById("potentialCustomers");
-  potentialTable.innerHTML = "";
-  potentialCustomers.forEach((customer) => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${customer.id}</td>
-      <td>${customer.name}</td>
-      <td>${customer.totalTransaction}</td>
-      <td>${customer.totalQty}</td>
-    `;
-    potentialTable.appendChild(row);
-  });
+  if(potentialTable) {
+    potentialTable.innerHTML = "";
+    potentialCustomers.forEach((customer) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${customer.id}</td>
+        <td>${customer.name}</td>
+        <td>${customer.totalTransaction}</td>
+        <td>${customer.totalQty}</td>
+      `;
+      potentialTable.appendChild(row);
+    });
+  }
 
   // 4. Sales Trend Analysis - Chart
-  document.getElementById("dealsOpen").textContent =
-    pipelineData.lead +
-    pipelineData.qualification +
-    pipelineData.proposal +
-    pipelineData.negotiation;
-  document.getElementById("dealsClosed").textContent =
-    pipelineData.closedWon;
+  const dealsOpenEl = document.getElementById("dealsOpen");
+  const dealsClosedEl = document.getElementById("dealsClosed");
+  if (dealsOpenEl) {
+    dealsOpenEl.textContent =
+      pipelineData.lead +
+      pipelineData.qualification +
+      pipelineData.proposal +
+      pipelineData.negotiation;
+  }
+  if(dealsClosedEl) {
+    dealsClosedEl.textContent =
+      pipelineData.closedWon;
+  }
 
   const ctx = document.getElementById("salesTrendChart");
   if (ctx) {
@@ -1023,6 +1080,7 @@ function initAnalytics() {
   // 5. Product List
   function renderProducts() {
     const productTable = document.getElementById("productTable");
+    if (!productTable) return;
     productTable.innerHTML = "";
     products.forEach((product) => {
       const row = document.createElement("tr");
@@ -1054,7 +1112,7 @@ function initAnalytics() {
   if (addProductBtn) {
     addProductBtn.onclick = () => {
       productForm.reset();
-      const newId = `P4P${String(products.length + 0).padStart(1, "1")}`;
+      const newId = `P4P${String(products.length + 1).padStart(2, "0")}`;
       document.getElementById("productId").value = newId;
       productSidebar.classList.add("active");
     };
@@ -1089,7 +1147,7 @@ function initAnalytics() {
   }
 }
 
-/* ====== PIPELINE LOGIC ====== */
+/* ====== PIPELINE LOGIC (tidak berubah) ====== */
 function initPipeline() {
   const pipelineEl = document.getElementById("pipeline");
   const sidebar = document.getElementById("sidebar");
@@ -1134,6 +1192,7 @@ function initPipeline() {
   ];
 
   function renderPipeline() {
+    if (!pipelineEl) return;
     pipelineEl.innerHTML = "";
     stages.forEach((stage) => {
       const column = document.createElement("div");
@@ -1207,32 +1266,38 @@ function initPipeline() {
     });
   }
 
-  addDealBtn.onclick = () => {
-    sidebar.classList.add("active");
-  };
-
-  closeSidebar.onclick = () => {
-    sidebar.classList.remove("active");
-  };
-
-  dealForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const newDeal = {
-      id: `D${String(deals.length + 1).padStart(3, "0")}`,
-      title: document.getElementById("dealTitle").value,
-      customer: document.getElementById("customerName").value,
-      stage: document.getElementById("dealStage").value,
+  if(addDealBtn) {
+    addDealBtn.onclick = () => {
+      sidebar.classList.add("active");
     };
-    deals.push(newDeal);
-    renderPipeline();
-    sidebar.classList.remove("active");
-    dealForm.reset();
-  });
+  }
+
+  if(closeSidebar) {
+    closeSidebar.onclick = () => {
+      sidebar.classList.remove("active");
+    };
+  }
+
+  if(dealForm) {
+    dealForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const newDeal = {
+        id: `D${String(deals.length + 1).padStart(3, "0")}`,
+        title: document.getElementById("dealTitle").value,
+        customer: document.getElementById("customerName").value,
+        stage: document.getElementById("dealStage").value,
+      };
+      deals.push(newDeal);
+      renderPipeline();
+      sidebar.classList.remove("active");
+      dealForm.reset();
+    });
+  }
 
   renderPipeline();
 }
 
-// --- Fungsi untuk Halaman Orders & Invoices ---
+// --- Fungsi untuk Halaman Orders & Invoices (tidak berubah) ---
 function initOrders() {
   let transactions = [
     { id: "TXN001", customer: "Alex Tan", product: "Cloth Tape Black", date: "2025-10-15", payment: "Bank Transfer", amount: 1250, status: "Ongoing" },
@@ -1273,6 +1338,7 @@ function initOrders() {
 
   function renderTransactions(filteredTransactions = transactions) {
     const tbody = document.getElementById("transactionBody");
+    if(!tbody) return;
     tbody.innerHTML = "";
 
     filteredTransactions.forEach(transaction => {
@@ -1348,50 +1414,63 @@ function initOrders() {
     }
   };
 
-  document.getElementById("addNewBtn").addEventListener("click", () => {
-    editingTransactionId = null;
-    document.getElementById("sidebarTitle").textContent = "Add New Transaction";
-    document.getElementById("transactionForm").reset();
-    const newId = `TXN${String(transactions.length + 1).padStart(3, '0')}`;
-    document.getElementById("transactionId").value = newId;
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById("transactionDate").value = today;
-    document.getElementById("transactionSidebar").classList.add("active");
-  });
+  const addNewBtn = document.getElementById("addNewBtn");
+  if (addNewBtn) {
+    addNewBtn.addEventListener("click", () => {
+      editingTransactionId = null;
+      document.getElementById("sidebarTitle").textContent = "Add New Transaction";
+      document.getElementById("transactionForm").reset();
+      const newId = `TXN${String(transactions.length + 1).padStart(3, '0')}`;
+      document.getElementById("transactionId").value = newId;
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById("transactionDate").value = today;
+      document.getElementById("transactionSidebar").classList.add("active");
+    });
+  }
+  
+  const closeSidebarBtn = document.getElementById("closeSidebar");
+  if(closeSidebarBtn) {
+    closeSidebarBtn.addEventListener("click", () => {
+      document.getElementById("transactionSidebar").classList.remove("active");
+    });
+  }
 
-  document.getElementById("closeSidebar").addEventListener("click", () => {
-    document.getElementById("transactionSidebar").classList.remove("active");
-  });
+  const transactionForm = document.getElementById("transactionForm");
+  if(transactionForm) {
+    transactionForm.addEventListener("submit", (e) => {
+      e.preventDefault();
 
-  document.getElementById("transactionForm").addEventListener("submit", (e) => {
-    e.preventDefault();
+      const transactionData = {
+        id: document.getElementById("transactionId").value,
+        customer: document.getElementById("customerName").value,
+        product: document.getElementById("productName").value,
+        date: document.getElementById("transactionDate").value,
+        payment: document.getElementById("paymentMethod").value,
+        amount: parseFloat(document.getElementById("totalAmount").value),
+        status: document.getElementById("status").value
+      };
 
-    const transactionData = {
-      id: document.getElementById("transactionId").value,
-      customer: document.getElementById("customerName").value,
-      product: document.getElementById("productName").value,
-      date: document.getElementById("transactionDate").value,
-      payment: document.getElementById("paymentMethod").value,
-      amount: parseFloat(document.getElementById("totalAmount").value),
-      status: document.getElementById("status").value
-    };
-
-    if (editingTransactionId) {
-      const index = transactions.findIndex(t => t.id === editingTransactionId);
-      if (index > -1) {
-        transactions[index] = transactionData;
+      if (editingTransactionId) {
+        const index = transactions.findIndex(t => t.id === editingTransactionId);
+        if (index > -1) {
+          transactions[index] = transactionData;
+        }
+      } else {
+        transactions.push(transactionData);
       }
-    } else {
-      transactions.push(transactionData);
-    }
 
-    document.getElementById("transactionSidebar").classList.remove("active");
-    filterTransactions();
-  });
+      document.getElementById("transactionSidebar").classList.remove("active");
+      filterTransactions();
+    });
+  }
 
-  document.getElementById("filterStatus").addEventListener("change", filterTransactions);
-  document.getElementById("filterPayment").addEventListener("change", filterTransactions);
-  document.getElementById("searchInput").addEventListener("input", filterTransactions);
+  const filterStatus = document.getElementById("filterStatus");
+  const filterPayment = document.getElementById("filterPayment");
+  const searchInput = document.getElementById("searchInput");
+
+  if (filterStatus) filterStatus.addEventListener("change", filterTransactions);
+  if (filterPayment) filterPayment.addEventListener("change", filterTransactions);
+  if (searchInput) searchInput.addEventListener("input", filterTransactions);
 
   renderTransactions();
 }
