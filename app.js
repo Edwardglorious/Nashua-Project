@@ -343,6 +343,9 @@ const customersAndOrdersTemplate = `
     <div class="form-group"><label>Customer ID</label><input type="text" id="custId" required></div>
     <div class="form-group"><label>Email</label><input type="email" id="custEmail" required></div>
     <div class="form-group"><label>Phone</label><input type="tel" id="custPhone" required></div>
+    <div class="form-group"><label>Total Transaction</label><input type="number" id="custTotalTransaction" min="0" value="0" required></div>
+    <div class="form-group"><label>Amount per Transaction (USD)</label><input type="number" id="custAmountPerTransaction" min="0" step="0.01" value="850" required></div>
+    <div class="form-group"><label>Total Amount (USD)</label><input type="number" id="custTotalAmount" min="0" step="0.01" value="0" readonly style="background-color: #2a2a2a; cursor: not-allowed;"></div>
     <button type="submit" class="submit-btn" id="customerSubmitBtn">Add Customer</button>
     <button type="button" class="cancel-btn" id="cancelCustomerBtn" style="width:100%;margin-top:10px;">Cancel</button>
   </form>
@@ -468,8 +471,8 @@ function initDashboard() {
 
 /* --- Inisialisasi Halaman GABUNGAN (Customers & Orders) --- */
 function initCustomersAndOrders() {
-  
-  // --- Bagian Logika dari initOrders ---
+
+  /* === BAGIAN ORDERS (tidak diubah, tetap berfungsi) === */
   let editingTransactionId = null;
 
   function updateSummary() {
@@ -520,8 +523,8 @@ function initCustomersAndOrders() {
     const paymentFilter = document.getElementById("filterPayment").value;
     const searchTerm = document.getElementById("searchInput").value.toLowerCase();
     let filtered = transactions;
-    if (statusFilter !== "all") { filtered = filtered.filter(t => t.status === statusFilter); }
-    if (paymentFilter !== "all") { filtered = filtered.filter(t => t.payment === paymentFilter); }
+    if (statusFilter !== "all") filtered = filtered.filter(t => t.status === statusFilter);
+    if (paymentFilter !== "all") filtered = filtered.filter(t => t.payment === paymentFilter);
     if (searchTerm) {
       filtered = filtered.filter(t =>
         t.id.toLowerCase().includes(searchTerm) ||
@@ -553,7 +556,7 @@ function initCustomersAndOrders() {
       const index = transactions.findIndex(t => t.id === id);
       if (index > -1) {
         transactions.splice(index, 1);
-        saveOngoingTransactions(); // Simpan ke LocalStorage
+        saveOngoingTransactions();
         filterTransactions();
       }
     }
@@ -572,16 +575,16 @@ function initCustomersAndOrders() {
       document.getElementById("transactionSidebar").classList.add("active");
     });
   }
-  
+
   const closeSidebarBtn = document.getElementById("closeSidebar");
-  if(closeSidebarBtn) {
+  if (closeSidebarBtn) {
     closeSidebarBtn.addEventListener("click", () => {
       document.getElementById("transactionSidebar").classList.remove("active");
     });
   }
 
   const transactionForm = document.getElementById("transactionForm");
-  if(transactionForm) {
+  if (transactionForm) {
     transactionForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const transactionData = {
@@ -595,26 +598,24 @@ function initCustomersAndOrders() {
       };
       if (editingTransactionId) {
         const index = transactions.findIndex(t => t.id === editingTransactionId);
-        if (index > -1) { transactions[index] = transactionData; }
+        if (index > -1) transactions[index] = transactionData;
       } else {
         transactions.push(transactionData);
       }
-      saveOngoingTransactions(); // Simpan ke LocalStorage
+      saveOngoingTransactions();
       document.getElementById("transactionSidebar").classList.remove("active");
       filterTransactions();
     });
   }
 
-  const filterStatus = document.getElementById("filterStatus");
-  const filterPayment = document.getElementById("filterPayment");
-  const searchInput = document.getElementById("searchInput");
-  if (filterStatus) filterStatus.addEventListener("change", filterTransactions);
-  if (filterPayment) filterPayment.addEventListener("change", filterTransactions);
-  if (searchInput) searchInput.addEventListener("input", filterTransactions);
+  ["filterStatus", "filterPayment", "searchInput"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("input", filterTransactions);
+  });
 
-  renderOngoingTransactions(); // Panggil fungsi render untuk transaksi
+  renderOngoingTransactions();
 
-  // --- Bagian Logika dari initCustomers ---
+  /* === BAGIAN CUSTOMERS (ditambah fungsi auto hitung total) === */
   const customerSidebar = document.getElementById("customerSidebar");
   const customerForm = document.getElementById("customerForm");
   const addCustomerBtn = document.getElementById("addCustomerBtn");
@@ -622,11 +623,11 @@ function initCustomersAndOrders() {
   const cancelCustomerBtn = document.getElementById("cancelCustomerBtn");
   const customersTableBody = document.getElementById("customersTableBody");
   const transactionTableBody = document.getElementById("transactionTableBody");
-  
+
   let editingCustomerId = null;
 
+  // 🔹 Render Customer List
   function renderCustomers() {
-    if(!customersTableBody) return;
     customersTableBody.innerHTML = "";
     customersData.forEach((customer) => {
       const row = document.createElement("tr");
@@ -636,18 +637,17 @@ function initCustomersAndOrders() {
         <td>${customer.email}</td>
         <td>${customer.phone}</td>
         <td>${customer.totalTransaction}</td>
-        <td>${customer.totalAmount.toLocaleString()}</td>
+        <td>$${customer.totalAmount.toLocaleString()}</td>
         <td>
-          <button onclick="editCustomer('${customer.id}')" style="background:#007bff;color:#fff;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;margin-right:5px;font-size:11px;">Edit</button>
-          <button onclick="deleteCustomer('${customer.id}')" style="background:#dc3545;color:#fff;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;font-size:11px;">Delete</button>
-        </td>
-      `;
+          <button onclick="editCustomer('${customer.id}')" class="action-btn">Edit</button>
+          <button onclick="deleteCustomer('${customer.id}')" class="action-btn delete">Delete</button>
+        </td>`;
       customersTableBody.appendChild(row);
     });
   }
 
+  // 🔹 Render Transaction History
   function renderCustomerTransactions() {
-    if(!transactionTableBody) return;
     transactionTableBody.innerHTML = "";
     transactionsData.forEach((transaction) => {
       const row = document.createElement("tr");
@@ -659,20 +659,38 @@ function initCustomersAndOrders() {
         <td>${transaction.productName}</td>
         <td>${transaction.quantity}</td>
         <td>${transaction.unitPrice.toFixed(2)}</td>
-        <td>${transaction.subtotal.toFixed(2)}</td>
-      `;
+        <td>${transaction.subtotal.toFixed(2)}</td>`;
       transactionTableBody.appendChild(row);
     });
   }
 
+  // 🔹 Tambah perhitungan otomatis untuk Total Amount
+  const totalTransEl = document.getElementById("custTotalTransaction");
+  const amountPerTransEl = document.getElementById("custAmountPerTransaction");
+  const totalAmountEl = document.getElementById("custTotalAmount");
+
+  function updateTotalAmount() {
+    const total = (parseFloat(totalTransEl.value) || 0) * (parseFloat(amountPerTransEl.value) || 0);
+    totalAmountEl.value = total.toFixed(2);
+  }
+
+  if (totalTransEl && amountPerTransEl) {
+    totalTransEl.addEventListener("input", updateTotalAmount);
+    amountPerTransEl.addEventListener("input", updateTotalAmount);
+  }
+
+  // 🔹 Edit Customer
   window.editCustomer = function (id) {
-    const customer = customersData.find((c) => c.id === id);
-    if (customer) {
+    const c = customersData.find((x) => x.id === id);
+    if (c) {
       editingCustomerId = id;
-      document.getElementById("custId").value = customer.id;
-      document.getElementById("custName").value = customer.name;
-      document.getElementById("custEmail").value = customer.email;
-      document.getElementById("custPhone").value = customer.phone;
+      document.getElementById("custId").value = c.id;
+      document.getElementById("custName").value = c.name;
+      document.getElementById("custEmail").value = c.email;
+      document.getElementById("custPhone").value = c.phone;
+      document.getElementById("custTotalTransaction").value = c.totalTransaction;
+      document.getElementById("custAmountPerTransaction").value = c.totalTransaction > 0 ? (c.totalAmount / c.totalTransaction).toFixed(2) : 0;
+      document.getElementById("custTotalAmount").value = c.totalAmount.toFixed(2);
       document.getElementById("custId").readOnly = true;
       document.getElementById("customerFormTitle").textContent = "Edit Customer";
       document.getElementById("customerSubmitBtn").textContent = "Update Customer";
@@ -680,73 +698,73 @@ function initCustomersAndOrders() {
     }
   };
 
+  // 🔹 Delete Customer
   window.deleteCustomer = function (id) {
     if (confirm("Are you sure you want to delete this customer?")) {
-      const index = customersData.findIndex((c) => c.id === id);
-      if (index > -1) {
-        customersData.splice(index, 1);
-        saveCustomers(); // Simpan ke LocalStorage
+      const idx = customersData.findIndex((x) => x.id === id);
+      if (idx > -1) {
+        customersData.splice(idx, 1);
+        saveCustomers();
         renderCustomers();
       }
     }
   };
 
-  if(addCustomerBtn) {
-    addCustomerBtn.onclick = () => {
-      editingCustomerId = null;
-      customerForm.reset();
-      document.getElementById("custId").readOnly = false;
-      document.getElementById("customerFormTitle").textContent = "Add New Customer";
-      document.getElementById("customerSubmitBtn").textContent = "Add Customer";
-      customerSidebar.classList.add("active");
-    };
-  }
+  // 🔹 Add New Customer
+  addCustomerBtn.onclick = () => {
+    editingCustomerId = null;
+    customerForm.reset();
+    document.getElementById("custId").readOnly = false;
+    document.getElementById("custTotalAmount").value = "0.00";
+    document.getElementById("customerFormTitle").textContent = "Add New Customer";
+    document.getElementById("customerSubmitBtn").textContent = "Add Customer";
+    customerSidebar.classList.add("active");
+  };
 
-  if(closeCustomerSidebarBtn) {
-    closeCustomerSidebarBtn.onclick = () => {
+  // 🔹 Cancel dan Close Sidebar
+  [closeCustomerSidebarBtn, cancelCustomerBtn].forEach(btn => {
+    if (btn) btn.onclick = () => {
       customerSidebar.classList.remove("active");
       editingCustomerId = null;
       customerForm.reset();
     };
-  }
+  });
 
-  if(cancelCustomerBtn) {
-    cancelCustomerBtn.onclick = () => {
-      customerSidebar.classList.remove("active");
-      editingCustomerId = null;
-      customerForm.reset();
-    };
-  }
+  // 🔹 Submit Customer
+  customerForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const id = document.getElementById("custId").value.trim();
+    const name = document.getElementById("custName").value.trim();
+    const email = document.getElementById("custEmail").value.trim();
+    const phone = document.getElementById("custPhone").value.trim();
+    const totalTransaction = parseInt(totalTransEl.value) || 0;
+    const amountPerTransaction = parseFloat(amountPerTransEl.value) || 0;
+    const totalAmount = totalTransaction * amountPerTransaction;
 
-  if(customerForm) {
-    customerForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const id = document.getElementById("custId").value;
-      const name = document.getElementById("custName").value;
-      const email = document.getElementById("custEmail").value;
-      const phone = document.getElementById("custPhone").value;
-
-      if (editingCustomerId) {
-        const customer = customersData.find((c) => c.id === editingCustomerId);
-        if (customer) {
-          customer.name = name;
-          customer.email = email;
-          customer.phone = phone;
-        }
-      } else {
-        customersData.push({ id, name, email, phone, totalTransaction: 0, totalAmount: 0 });
+    if (editingCustomerId) {
+      const c = customersData.find((x) => x.id === editingCustomerId);
+      if (c) {
+        c.name = name;
+        c.email = email;
+        c.phone = phone;
+        c.totalTransaction = totalTransaction;
+        c.totalAmount = totalAmount;
       }
-      saveCustomers(); // Simpan ke LocalStorage
-      renderCustomers();
-      customerSidebar.classList.remove("active");
-      editingCustomerId = null;
-      customerForm.reset();
-    });
-  }
+    } else {
+      customersData.push({ id, name, email, phone, totalTransaction, totalAmount });
+    }
+
+    saveCustomers();
+    renderCustomers();
+    customerSidebar.classList.remove("active");
+    editingCustomerId = null;
+    customerForm.reset();
+  });
 
   renderCustomers();
   renderCustomerTransactions();
 }
+
 
 
 /* --- Inisialisasi Halaman Analytics (Diperbarui) --- */
@@ -1043,48 +1061,57 @@ function initPipeline() {
         <div class="cards-container"></div>`;
 
       const cardsContainer = column.querySelector(".cards-container");
-      deals.filter((d) => d.stage === stage).forEach((deal) => {
-        const card = document.createElement("div");
-        card.className = "deal-card";
-        card.draggable = true;
-        card.setAttribute("data-deal-id", deal.id);
-        card.innerHTML = `
-          <div class="deal-header">${deal.id}</div>
-          <div class="deal-name">${deal.title}</div>
-          <div class="deal-meta">${deal.customer}</div>`;
+      deals
+        .filter((d) => d.stage === stage)
+        .forEach((deal) => {
+          const card = document.createElement("div");
+          card.className = "deal-card";
+          card.draggable = true;
+          card.setAttribute("data-deal-id", deal.id);
+          card.innerHTML = `
+            <div class="deal-header">${deal.id}</div>
+            <div class="deal-name">${deal.title}</div>
+            <div class="deal-meta">${deal.customer}</div>`;
 
-        // Listener untuk Edit saat kartu diklik
-        card.addEventListener("click", () => editDeal(deal.id));
+          // Edit deal saat diklik
+          card.addEventListener("click", () => editDeal(deal.id));
 
-        card.addEventListener("dragstart", (e) => {
-          draggedCard = card;
-          card.classList.add("dragging");
+          // Drag events
+          card.addEventListener("dragstart", () => {
+            draggedCard = card;
+            card.classList.add("dragging");
+          });
+          card.addEventListener("dragend", () => {
+            card.classList.remove("dragging");
+            draggedCard = null;
+          });
+
+          cardsContainer.appendChild(card);
         });
-        card.addEventListener("dragend", () => {
-          card.classList.remove("dragging");
-          draggedCard = null;
-        });
-        cardsContainer.appendChild(card);
-      });
 
-      column.addEventListener("dragover", (e) => { e.preventDefault(); column.classList.add("drop-target"); });
-      column.addEventListener("dragleave", () => { column.classList.remove("drop-target"); });
-      column.addEventListener("drop", (e) => {
+      // Drag & Drop antar kolom
+      column.addEventListener("dragover", (e) => {
         e.preventDefault();
+        column.classList.add("drop-target");
+      });
+      column.addEventListener("dragleave", () => column.classList.remove("drop-target"));
+      column.addEventListener("drop", () => {
         column.classList.remove("drop-target");
         if (draggedCard) {
           const dealId = draggedCard.getAttribute("data-deal-id");
           const deal = deals.find((d) => d.id === dealId);
           if (deal) {
             deal.stage = stage;
-            saveSalesDeals(); // Simpan ke LocalStorage
+            saveSalesDeals();
             renderPipeline();
           }
         }
       });
+
+      // Tombol tambah card di tiap stage
       const addBtn = column.querySelector(".add-card-btn");
       addBtn.onclick = () => {
-        editingDealId = null; // Mode "Add New"
+        editingDealId = null;
         dealForm.reset();
         document.getElementById("dealStage").value = stage;
         document.getElementById("dealSidebarTitle").textContent = "Add New Deal";
@@ -1092,20 +1119,21 @@ function initPipeline() {
         document.getElementById("dealId").readOnly = false;
         sidebar.classList.add("active");
       };
+
       pipelineEl.appendChild(column);
     });
   }
-  
-  // Fungsi untuk mengedit deal
+
+  // Fungsi edit deal
   function editDeal(id) {
-    const deal = deals.find(d => d.id === id);
-    if(deal) {
+    const deal = deals.find((d) => d.id === id);
+    if (deal) {
       editingDealId = id;
       document.getElementById("dealId").value = deal.id;
       document.getElementById("dealTitle").value = deal.title;
       document.getElementById("customerName").value = deal.customer;
       document.getElementById("dealStage").value = deal.stage;
-      
+
       document.getElementById("dealId").readOnly = true;
       document.getElementById("dealSidebarTitle").textContent = "Edit Deal";
       document.getElementById("dealSubmitBtn").textContent = "Update Deal";
@@ -1115,7 +1143,7 @@ function initPipeline() {
 
   if (addDealBtn) {
     addDealBtn.onclick = () => {
-      editingDealId = null; // Mode "Add New"
+      editingDealId = null;
       dealForm.reset();
       document.getElementById("dealSidebarTitle").textContent = "Add New Deal";
       document.getElementById("dealSubmitBtn").textContent = "Add Deal";
@@ -1123,10 +1151,9 @@ function initPipeline() {
       sidebar.classList.add("active");
     };
   }
+
   if (closeSidebar) {
-    closeSidebar.onclick = () => {
-      sidebar.classList.remove("active");
-    };
+    closeSidebar.onclick = () => sidebar.classList.remove("active");
   }
 
   if (dealForm) {
@@ -1136,40 +1163,33 @@ function initPipeline() {
         id: document.getElementById("dealId").value,
         title: document.getElementById("dealTitle").value,
         customer: document.getElementById("customerName").value,
-        stage: document.getElementById("dealStage").value
+        stage: document.getElementById("dealStage").value,
       };
 
       if (editingDealId) {
-        // Mode Edit
-        const index = deals.findIndex(d => d.id === editingDealId);
-        if (index > -1) {
-          deals[index] = dealData;
-        }
+        const index = deals.findIndex((d) => d.id === editingDealId);
+        if (index > -1) deals[index] = dealData;
       } else {
-        // Mode Add New
-        // Cek jika ID sudah ada
-        if (deals.some(d => d.id === dealData.id)) {
+        if (deals.some((d) => d.id === dealData.id)) {
           alert("Deal ID already exists. Please use a unique ID.");
           return;
         }
         deals.push(dealData);
       }
-      
-      saveSalesDeals(); // Simpan ke LocalStorage
+
+      saveSalesDeals();
       renderPipeline();
       sidebar.classList.remove("active");
-      dealForm.reset();
       editingDealId = null;
+      dealForm.reset();
     });
   }
 
   renderPipeline();
+}
 
-
-/* --- INISIALISASI SAAT MEMUAT HALAMAN --- */
+/* --- INISIALISASI SAAT HALAMAN DIMUAT --- */
 checkLogin();
-// Muat dashboard sebagai halaman default jika sudah login
 if (sessionStorage.getItem("isAdminLoggedIn") === "true") {
   navigateTo("dashboard");
-}
 }
