@@ -933,61 +933,89 @@ function initAnalytics() {
   renderProducts();
 
   // Product Form (Diperbarui untuk menangani Edit)
-  const productSidebar = document.getElementById("productSidebar");
-  const addProductBtn = document.getElementById("addProductBtn");
-  const closeProductSidebar = document.getElementById("closeProductSidebar");
-  const productForm = document.getElementById("productForm");
+// product sidebar + form setup (replace your existing block)
+const productSidebar = document.getElementById("productSidebar");
+const addProductBtn = document.getElementById("addProductBtn");
+const closeProductSidebar = document.getElementById("closeProductSidebar");
+// NOTE: use let so we can reassign after cloning
+let productForm = document.getElementById("productForm");
 
-  if (addProductBtn) {
-    addProductBtn.onclick = () => {
-      editingProductId = null; // Pastikan mode "Add New"
-      productForm.reset();
-      const newId = `P4P${String(products.length + 1).padStart(1, '0')}`;
-      document.getElementById("productId").value = newId;
-      document.querySelector("#productSidebar .sidebar-header h2").textContent = "Add New Product";
-      document.querySelector("#productSidebar .submit-btn").textContent = "Add Product";
-      productSidebar.classList.add("active");
+if (!productSidebar) {
+  console.warn("productSidebar not found in DOM");
+}
+
+// Helper to initialize/ensure single submit listener
+function initProductForm() {
+  if (!productForm) {
+    productForm = document.getElementById("productForm");
+    if (!productForm) return;
+  }
+
+  // Remove old listeners by cloning (only if it's already in DOM)
+  const cleaned = productForm.cloneNode(true);
+  productForm.parentNode.replaceChild(cleaned, productForm);
+  productForm = cleaned; // reassign to the new element
+
+  // Add single submit listener
+  productForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const productData = {
+      id: document.getElementById("productId").value,
+      name: document.getElementById("productName").value,
+      category: document.getElementById("productCategory").value,
+      price: parseInt(document.getElementById("productPrice").value) || 0,
+      supply: document.getElementById("productSupply").value,
+      stock: document.getElementById("productStock").value,
+      width: parseInt(document.getElementById("productWidth").value) || 0,
+      length: parseInt(document.getElementById("productLength").value) || 0,
+      rating: parseFloat(document.getElementById("productRating").value) || 0
     };
-  }
 
-  if (closeProductSidebar) {
-    closeProductSidebar.onclick = () => {
-      productSidebar.classList.remove("active");
-    };
-  }
+    if (editingProductId) {
+      const index = products.findIndex(p => p.id === editingProductId);
+      if (index > -1) products[index] = productData;
+    } else {
+      products.push(productData);
+    }
 
-  if (productForm) {
-    productForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const productData = {
-        id: document.getElementById("productId").value,
-        name: document.getElementById("productName").value,
-        category: document.getElementById("productCategory").value,
-        price: parseInt(document.getElementById("productPrice").value),
-        supply: document.getElementById("productSupply").value,
-        stock: document.getElementById("productStock").value,
-        width: parseInt(document.getElementById("productWidth").value),
-        length: parseInt(document.getElementById("productLength").value),
-        rating: parseFloat(document.getElementById("productRating").value)
-      };
+    saveProducts();
+    renderProducts();
+    productSidebar.classList.remove("active");
+    editingProductId = null;
+  });
+}
 
-      if (editingProductId) {
-        // Mode Edit
-        const index = products.findIndex(p => p.id === editingProductId);
-        if (index > -1) {
-          products[index] = productData;
-        }
-      } else {
-        // Mode Add New
-        products.push(productData);
-      }
-      
-      saveProducts(); // Simpan ke LocalStorage
-      renderProducts();
-      productSidebar.classList.remove("active");
-      editingProductId = null; // Reset status edit
-    });
-  }
+// Initialize once
+if (productForm) initProductForm();
+
+// Ensure Add button uses the current productForm reference
+if (addProductBtn) {
+  addProductBtn.onclick = () => {
+    editingProductId = null;
+    // safety: re-query if needed (in case DOM changed)
+    if (!productForm) productForm = document.getElementById("productForm");
+    if (!productForm) {
+      console.error("productForm not found when clicking Add");
+      return;
+    }
+    productForm.reset();
+    const newId = `P4P${String(products.length + 1).padStart(2, '0')}`;
+    document.getElementById("productId").value = newId;
+    const headerEl = document.querySelector("#productSidebar .sidebar-header h2");
+    const submitBtnEl = document.querySelector("#productSidebar .submit-btn");
+    if (headerEl) headerEl.textContent = "Add New Product";
+    if (submitBtnEl) submitBtnEl.textContent = "Add Product";
+    productSidebar.classList.add("active");
+  };
+}
+
+// Close button
+if (closeProductSidebar) {
+  closeProductSidebar.onclick = () => {
+    productSidebar.classList.remove("active");
+  };
+}
 }
 
 /* --- Inisialisasi Halaman Sales Pipeline (Diperbarui) --- */
@@ -1136,7 +1164,6 @@ function initPipeline() {
   }
 
   renderPipeline();
-}
 
 
 /* --- INISIALISASI SAAT MEMUAT HALAMAN --- */
@@ -1144,4 +1171,5 @@ checkLogin();
 // Muat dashboard sebagai halaman default jika sudah login
 if (sessionStorage.getItem("isAdminLoggedIn") === "true") {
   navigateTo("dashboard");
+}
 }
