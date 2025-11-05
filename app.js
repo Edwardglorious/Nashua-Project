@@ -177,12 +177,23 @@ const dashboardTemplate = `
   </div>
 
   <div class="card" style="grid-column: 1 / -1;">
-    <div class="card-header">Sales Pipeline Overview</div>
-    <div class="pipeline-overview">
-      <div class="pipeline-stage"><div class="pipeline-stage-name">Lead</div></div>
-      <div class="pipeline-stage"><div class="pipeline-stage-name">Qualification</div></div>
-      <div class="pipeline-stage"><div class="pipeline-stage-name">Proposal</div></div>
-      <div class="pipeline-stage"><div class="pipeline-stage-name">Negotiation</div></div>
+  <div class="card-header">Sales Pipeline Overview</div>
+  <div class="pipeline-overview">
+    <div class="pipeline-stage">
+      <div class="pipeline-stage-count">0</div>
+      <div class="pipeline-stage-name">Lead</div>
+    </div>
+    <div class="pipeline-stage">
+      <div class="pipeline-stage-count">0</div>
+      <div class="pipeline-stage-name">Qualification</div>
+    </div>
+    <div class="pipeline-stage">
+      <div class="pipeline-stage-count">0</div>
+      <div class="pipeline-stage-name">Proposal</div>
+    </div>
+    <div class="pipeline-stage">
+      <div class="pipeline-stage-count">0</div>
+      <div class="pipeline-stage-name">Negotiation</div>
     </div>
   </div>
 </div>
@@ -497,7 +508,37 @@ navLinks.forEach((link) => {
 /* ====== FUNGSI INISIALISASI HALAMAN ====== */
 
 /* --- Inisialisasi Halaman Dashboard (Diperbarui) --- */
+/* --- Inisialisasi Halaman Dashboard (Diperbarui) --- */
 function initDashboard() {
+  // Calculate real pipeline counts from deals data
+  const pipelineCounts = {
+    lead: deals.filter(d => d.stage === "NEW LEAD").length,
+    qualification: deals.filter(d => d.stage === "QUALIFICATION").length,
+    proposal: deals.filter(d => d.stage === "PROPOSAL").length,
+    negotiation: deals.filter(d => d.stage === "NEGOTIATION").length
+  };
+
+  // Update the pipeline overview with real numbers
+  const pipelineStages = document.querySelectorAll('.pipeline-stage');
+  if (pipelineStages.length >= 4) {
+    pipelineStages[0].innerHTML = `
+      <div class="pipeline-stage-count">${pipelineCounts.lead}</div>
+      <div class="pipeline-stage-name">Lead</div>
+    `;
+    pipelineStages[1].innerHTML = `
+      <div class="pipeline-stage-count">${pipelineCounts.qualification}</div>
+      <div class="pipeline-stage-name">Qualification</div>
+    `;
+    pipelineStages[2].innerHTML = `
+      <div class="pipeline-stage-count">${pipelineCounts.proposal}</div>
+      <div class="pipeline-stage-name">Proposal</div>
+    `;
+    pipelineStages[3].innerHTML = `
+      <div class="pipeline-stage-count">${pipelineCounts.negotiation}</div>
+      <div class="pipeline-stage-name">Negotiation</div>
+    `;
+  }
+
   // Menambahkan listener untuk kartu dashboard
   
   // 1. Kartu Top 10 Customers
@@ -524,11 +565,11 @@ function initDashboard() {
     newestOrderCard.addEventListener("click", () => navigateTo("orders"));
   }
 
-  // 5. Kartu Sales Pipeline Overview (semua kotak)
-  const pipelineStages = document.querySelectorAll('.pipeline-stage');
+  // 5. Kartu Sales Pipeline Overview (semua kotak) - with clickable functionality
   if (pipelineStages.length > 0) {
     pipelineStages.forEach(stage => {
       stage.addEventListener('click', () => navigateTo("sales"));
+      stage.style.cursor = 'pointer'; // Ensure cursor shows it's clickable
     });
   }
 }
