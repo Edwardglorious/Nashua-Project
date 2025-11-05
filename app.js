@@ -20,14 +20,30 @@ const validPass = "admin123";
 let customersData = JSON.parse(localStorage.getItem("customersData")) || [
   { id: "C0001", name: "Alex Tan", email: "alex@company.com", phone: "+62-811-1111", totalTransaction: 15, totalAmount: 9500 },
   { id: "C0002", name: "Benjamin Lee", email: "ben@company.com", phone: "+62-811-2222", totalTransaction: 12, totalAmount: 8200 },
-  // ... (Data pelanggan lainnya seperti sebelumnya)
+  { id: "C0003", name: "Catherine Wong", email: "catherine@company.com", phone: "+62-811-3333", totalTransaction: 10, totalAmount: 7800 },
+  { id: "C0004", name: "David Chen", email: "david@company.com", phone: "+62-811-4444", totalTransaction: 9, totalAmount: 6900 },
+  { id: "C0005", name: "Emily Zhang", email: "emily@company.com", phone: "+62-811-5555", totalTransaction: 8, totalAmount: 6450 },
+  { id: "C0006", name: "Frank Yusuf", email: "frank@company.com", phone: "+62-811-6666", totalTransaction: 22, totalAmount: 15600 },
+  { id: "C0007", name: "Grace Kim", email: "grace@company.com", phone: "+62-811-7777", totalTransaction: 18, totalAmount: 12300 },
+  { id: "C0008", name: "Henry Gunawan", email: "henry@company.com", phone: "+62-811-8888", totalTransaction: 14, totalAmount: 9800 },
+  { id: "C0009", name: "Irene Susilo", email: "irene@company.com", phone: "+62-811-9999", totalTransaction: 11, totalAmount: 7500 },
+  { id: "C0010", name: "Jason Hartono", email: "jason@company.com", phone: "+62-811-1010", totalTransaction: 25, totalAmount: 18900 },
+  { id: "C0011", name: "Karen Lim", email: "karen@company.com", phone: "+62-811-1111", totalTransaction: 6, totalAmount: 5200 },
   { id: "C0012", name: "Leo Tan", email: "leo@company.com", phone: "+62-811-1313", totalTransaction: 1, totalAmount: 850 }
 ];
 
-let transactionsData = JSON.parse(localStorage.getItem("transactionsData")) || [
-  { orderId: "20001", customerId: "C0001", transactionId: "TXN001", productId: "P4P02", productName: "Masking 2\" Tape", quantity: 5, unitPrice: 45, subtotal: 225, month: "January", region: "Asia Pacific (APAC)" },
-  // ... (Data transaksi lainnya seperti sebelumnya)
-  { orderId: "20015", customerId: "C0012", transactionId: "TXN012", productId: "P4P07", productName: "Warning Stripe Tape", quantity: 14, unitPrice: 40, subtotal: 560, month: "November", region: "Asia Pacific (APAC)" }
+// Data untuk Transaksi (Orders) - Dimuat dari LocalStorage
+let transactions = JSON.parse(localStorage.getItem("ongoingTransactions")) || [
+  { orderId: "20001", customerId: "C0001", transactionId: "TXN001", productId: "P4P01", productName: "Cloth Tape Black", quantity: 10, unitPrice: 26, total: 260, status: "Ongoing" },
+  { orderId: "20002", customerId: "C0002", transactionId: "TXN002", productId: "P4P02", productName: "Double Tape", quantity: 15, unitPrice: 24, total: 360, status: "Pending" },
+  { orderId: "20003", customerId: "C0003", transactionId: "TXN003", productId: "P4P03", productName: "Packaging Tape", quantity: 20, unitPrice: 18, total: 360, status: "Shipped" },
+  { orderId: "20004", customerId: "C0004", transactionId: "TXN004", productId: "P4P04", productName: "Aluminum Tape", quantity: 8, unitPrice: 32, total: 256, status: "Completed" },
+  { orderId: "20005", customerId: "C0005", transactionId: "TXN005", productId: "P4P05", productName: "Masking Tape", quantity: 12, unitPrice: 20, total: 240, status: "Ongoing" },
+  { orderId: "20006", customerId: "C0006", transactionId: "TXN006", productId: "P4P06", productName: "Foam Tape", quantity: 5, unitPrice: 28, total: 140, status: "Pending" },
+  { orderId: "20007", customerId: "C0007", transactionId: "TXN007", productId: "P4P07", productName: "Clear Tape Pro", quantity: 25, unitPrice: 22, total: 550, status: "Completed" },
+  { orderId: "20008", customerId: "C0008", transactionId: "TXN008", productId: "P4P08", productName: "Warning Stripe Tape", quantity: 18, unitPrice: 25, total: 450, status: "Shipped" },
+  { orderId: "20009", customerId: "C0009", transactionId: "TXN009", productId: "P4P09", productName: "Heavy Duty Tape", quantity: 7, unitPrice: 35, total: 245, status: "Ongoing" },
+  { orderId: "20010", customerId: "C0010", transactionId: "TXN010", productId: "P4P10", productName: "Electrical Tape", quantity: 30, unitPrice: 15, total: 450, status: "Completed" }
 ];
 
 let pipelineData = {
@@ -41,24 +57,41 @@ let pipelineData = {
 let products = JSON.parse(localStorage.getItem("productsData")) || [
   { id: "P4P01", name: "Nashua Top1 Cloth Tape Black (25 mm x 5 y)", category: "Cloth Tape", price: 26000, supply: "Active", stock: "Active", width: 25, length: 5, rating: 4.8 },
   { id: "P4P02", name: "Nashua Top1 Double Tape", category: "Double Tape", price: 24000, supply: "Active", stock: "Active", width: 24, length: 5, rating: 4.6 },
-  // ... (Data produk lainnya seperti sebelumnya)
+  { id: "P4P03", name: "Nashua Top1 Packaging Tape Clear", category: "Packaging Tape", price: 18000, supply: "Active", stock: "Active", width: 48, length: 100, rating: 4.7 },
+  { id: "P4P04", name: "Nashua Top1 Aluminum Foil Tape", category: "Aluminum Tape", price: 32000, supply: "Active", stock: "Active", width: 50, length: 45, rating: 4.5 },
+  { id: "P4P05", name: "Nashua Top1 Masking Tape", category: "Masking Tape", price: 20000, supply: "Active", stock: "Active", width: 24, length: 18, rating: 4.6 },
+  { id: "P4P06", name: "Nashua Top1 Foam Tape Double Side", category: "Foam Tape", price: 28000, supply: "Active", stock: "Active", width: 12, length: 5, rating: 4.7 },
+  { id: "P4P07", name: "Nashua Top1 Clear Tape Premium", category: "Clear Tape", price: 22000, supply: "Active", stock: "Active", width: 48, length: 100, rating: 4.9 },
+  { id: "P4P08", name: "Nashua Top1 Warning Stripe Tape", category: "Warning Tape", price: 25000, supply: "Active", stock: "Active", width: 48, length: 33, rating: 4.4 },
+  { id: "P4P09", name: "Nashua Top1 Heavy Duty Tape", category: "Packaging Tape", price: 35000, supply: "Active", stock: "Active", width: 48, length: 50, rating: 4.8 },
+  { id: "P4P10", name: "Nashua Top1 Electrical Insulation Tape", category: "Clear Tape", price: 15000, supply: "Active", stock: "Active", width: 19, length: 20, rating: 4.3 },
   { id: "P4P11", name: "Nashua Top1 Fragile Tape (48mm x 66m)", category: "Warning Tape", price: 22000, supply: "Active", stock: "Active", width: 48, length: 66, rating: 4.8 }
 ];
 
-// Data untuk Transaksi (Orders) - Dimuat dari LocalStorage
-let transactions = JSON.parse(localStorage.getItem("ongoingTransactions")) || [
-  { id: "TXN001", customer: "Alex Tan", product: "Cloth Tape Black", date: "2025-10-15", payment: "Bank Transfer", amount: 1250, status: "Ongoing" },
-  { id: "TXN002", customer: "Benjamin Lee", product: "Double Tape", date: "2025-10-16", payment: "Credit Card", amount: 890, status: "Ongoing" },
-  // ... (Data transaksi lainnya dari file 1)
-  { id: "TXN008", customer: "Henry Gunawan", product: "Clear Tape Pro", date: "2025-10-30", payment: "PayPal", amount: 1340, status: "Completed" }
-];
 
 // Data untuk Sales Pipeline (Deals) - Dimuat dari LocalStorage
 let deals = JSON.parse(localStorage.getItem("salesDeals")) || [
   { id: "D001", title: "Bulk Order - Manufacturing", customer: "PT Maju Jaya", stage: "NEW LEAD" },
   { id: "D002", title: "Partnership Deal", customer: "CV Sentosa", stage: "QUALIFICATION" },
-  // ... (Data deals lainnya)
+  { id: "D003", title: "Retail Partnership", customer: "ABC Store Chain", stage: "PROPOSAL" },
+  { id: "D004", title: "Supply Agreement", customer: "XYZ Manufacturing", stage: "NEGOTIATION" },
   { id: "D005", title: "Export Deal", customer: "Global Traders Inc", stage: "CLOSED/WON" }
+];
+
+// ADD THIS - Transaction History Data (for Analytics and Customer page)
+let transactionsData = JSON.parse(localStorage.getItem("transactionsData")) || [
+  { orderId: "20001", customerId: "C0001", transactionId: "TXN001", productId: "P4P01", productName: "Cloth Tape Black", quantity: 10, unitPrice: 26, subtotal: 260, month: "January", region: "Asia Pacific (APAC)" },
+  { orderId: "20002", customerId: "C0002", transactionId: "TXN002", productId: "P4P02", productName: "Double Tape", quantity: 15, unitPrice: 24, subtotal: 360, month: "February", region: "Asia Pacific (APAC)" },
+  { orderId: "20003", customerId: "C0003", transactionId: "TXN003", productId: "P4P03", productName: "Packaging Tape", quantity: 20, unitPrice: 18, subtotal: 360, month: "March", region: "Europe, Middle East & Africa (EMEA)" },
+  { orderId: "20004", customerId: "C0004", transactionId: "TXN004", productId: "P4P04", productName: "Aluminum Tape", quantity: 8, unitPrice: 32, subtotal: 256, month: "April", region: "Asia Pacific (APAC)" },
+  { orderId: "20005", customerId: "C0005", transactionId: "TXN005", productId: "P4P05", productName: "Masking Tape", quantity: 12, unitPrice: 20, subtotal: 240, month: "May", region: "North America" },
+  { orderId: "20006", customerId: "C0006", transactionId: "TXN006", productId: "P4P06", productName: "Foam Tape", quantity: 5, unitPrice: 28, subtotal: 140, month: "June", region: "Asia Pacific (APAC)" },
+  { orderId: "20007", customerId: "C0007", transactionId: "TXN007", productId: "P4P07", productName: "Clear Tape Pro", quantity: 25, unitPrice: 22, subtotal: 550, month: "July", region: "Europe, Middle East & Africa (EMEA)" },
+  { orderId: "20008", customerId: "C0008", transactionId: "TXN008", productId: "P4P08", productName: "Warning Stripe Tape", quantity: 18, unitPrice: 25, subtotal: 450, month: "August", region: "North America" },
+  { orderId: "20009", customerId: "C0009", transactionId: "TXN009", productId: "P4P09", productName: "Heavy Duty Tape", quantity: 7, unitPrice: 35, subtotal: 245, month: "September", region: "Asia Pacific (APAC)" },
+  { orderId: "20010", customerId: "C0010", transactionId: "TXN010", productId: "P4P10", productName: "Electrical Tape", quantity: 30, unitPrice: 15, subtotal: 450, month: "October", region: "Europe, Middle East & Africa (EMEA)" },
+  { orderId: "20011", customerId: "C0001", transactionId: "TXN011", productId: "P4P02", productName: "Double Tape", quantity: 20, unitPrice: 24, subtotal: 480, month: "November", region: "Asia Pacific (APAC)" },
+  { orderId: "20012", customerId: "C0002", transactionId: "TXN012", productId: "P4P05", productName: "Masking Tape", quantity: 10, unitPrice: 20, subtotal: 200, month: "November", region: "Asia Pacific (APAC)" }
 ];
 
 
@@ -265,13 +298,6 @@ const analyticsTemplate = `
 
 // --- Template GABUNGAN untuk Halaman "Orders" dan "Customers" ---
 const customersAndOrdersTemplate = `
-<div class="summary-cards">
-  <div class="summary-card"><div class="summary-label">Total Orders</div><div class="summary-value" id="totalOrders">0</div></div>
-  <div class="summary-card"><div class="summary-label">Ongoing</div><div class="summary-value" id="ongoingOrders">0</div></div>
-  <div class="summary-card"><div class="summary-label">Pending</div><div class="summary-value" id="pendingOrders">0</div></div>
-  <div class="summary-card"><div class="summary-label">Completed</div><div class="summary-value" id="completedOrders">0</div></div>
-  <div class="summary-card"><div class="summary-label">Total Revenue</div><div class="summary-value" id="totalRevenue">$0</div></div>
-</div>
 
 <div class="section">
   <div class="section-header">
@@ -305,31 +331,70 @@ const customersAndOrdersTemplate = `
     <button type="submit" class="submit-btn">Save Transaction</button>
   </form>
 </div>
+`;
 
-<div class="customers-wrapper">
-  <div class="section">
-    <div class="section-header">
-      <h2 class="section-title">Customer Lists</h2>
-      <button class="add-btn" id="addCustomerBtn" style="float:none;">+ Add New</button>
-    </div>
-    <div id="customersList" style="min-height:250px;">
-      <table class="customers-table">
-        <thead><tr><th>Customer_ID</th><th>Customer</th><th>Email</th><th>Phone</th><th>Total_Transaction</th><th>Total_Amount</th><th>Actions</th></tr></thead>
-        <tbody id="customersTableBody"></tbody>
-      </table>
-    </div>
+// --- Template for Orders page only ---
+const ordersTemplate = `
+<div class="section">
+  <div class="section-header">
+    <h2 class="section-title">Ongoing Transaction</h2>
+    <button class="add-btn" id="addNewBtn" style="float:none;">+ Add New</button>
   </div>
+  <div class="filters">
+    <div class="filter-group"><label>Status</label><select id="filterStatus"><option value="all">All Status</option><option value="Ongoing">Ongoing</option><option value="Pending">Pending</option><option value="Shipped">Shipped</option><option value="Completed">Completed</option></select></div>
+    <div class="filter-group"><label>Payment Method</label><select id="filterPayment"><option value="all">All Methods</option><option value="Bank Transfer">Bank Transfer</option><option value="Credit Card">Credit Card</option><option value="PayPal">PayPal</option><option value="Cash">Cash</option></select></div>
+    <div class="filter-group"><label>Search</label><input type="text" id="searchInput" placeholder="Search..."></div>
+  </div>
+  <table class="data-table" id="transactionTable">
+    <thead><tr><th>Order_ID</th><th>Customer_ID</th><th>Transaction_ID</th><th>Product_ID</th><th>Product_Name</th><th>Quantity</th><th>Unit_Price (USD)</th><th>Total (USD)</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody id="transactionBody"></tbody>
+  </table>
+</div>
 
-  <div class="section">
-    <div class="section-header">
-      <h2 class="section-title">Transaction History</h2>
-    </div>
-    <div id="transactionHistory" style="overflow-x:auto;">
-      <table class="customers-table">
-        <thead><tr><th>Order_ID</th><th>Customer_ID</th><th>Transaction_ID</th><th>Product_ID</th><th>Product_Name</th><th>Quantity</th><th>Unit_Price (USD)</th><th>Subtotal (USD)</th></tr></thead>
-        <tbody id="transactionTableBody"></tbody>
-      </table>
-    </div>
+<div class="sidebar" id="transactionSidebar">
+  <div class="sidebar-header">
+    <h2 id="sidebarTitle">Add New Transaction</h2>
+    <button class="close-btn" id="closeSidebar">×</button>
+  </div>
+  <form id="transactionForm">
+    <div class="form-group"><label>Order ID</label><input type="text" id="orderId" readonly></div>
+    <div class="form-group"><label>Customer ID</label><input type="text" id="customerId" required></div>
+    <div class="form-group"><label>Transaction ID</label><input type="text" id="transactionId" readonly></div>
+    <div class="form-group"><label>Product ID</label><input type="text" id="productId" required></div>
+    <div class="form-group"><label>Product Name</label><input type="text" id="productName" required></div>
+    <div class="form-group"><label>Quantity</label><input type="number" id="quantity" min="1" required></div>
+    <div class="form-group"><label>Unit Price (USD)</label><input type="number" id="unitPrice" step="0.01" min="0" required></div>
+    <div class="form-group"><label>Total (USD)</label><input type="number" id="totalAmount" step="0.01" readonly style="background-color: #2a2a2a;"></div>
+    <div class="form-group"><label>Status</label><select id="status" required><option value="Ongoing">Ongoing</option><option value="Pending">Pending</option><option value="Shipped">Shipped</option><option value="Completed">Completed</option></select></div>
+    <button type="submit" class="submit-btn">Save Transaction</button>
+  </form>
+</div>
+`;
+
+// --- Template for Customers page only ---
+const customersTemplate = `
+<div class="section">
+  <div class="section-header">
+    <h2 class="section-title">Customer Lists</h2>
+    <button class="add-btn" id="addCustomerBtn" style="float:none;">+ Add New</button>
+  </div>
+  <div id="customersList" style="min-height:250px;">
+    <table class="customers-table">
+      <thead><tr><th>Customer_ID</th><th>Customer</th><th>Email</th><th>Phone</th><th>Total_Transaction</th><th>Total_Amount</th><th>Actions</th></tr></thead>
+      <tbody id="customersTableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <h2 class="section-title">Transaction History</h2>
+  </div>
+  <div id="transactionHistory" style="overflow-x:auto;">
+    <table class="customers-table">
+      <thead><tr><th>Order_ID</th><th>Customer_ID</th><th>Transaction_ID</th><th>Product_ID</th><th>Product_Name</th><th>Quantity</th><th>Unit_Price (USD)</th><th>Subtotal (USD)</th></tr></thead>
+      <tbody id="transactionTableBody"></tbody>
+    </table>
   </div>
 </div>
 
@@ -350,7 +415,7 @@ const customersAndOrdersTemplate = `
     <button type="button" class="cancel-btn" id="cancelCustomerBtn" style="width:100%;margin-top:10px;">Cancel</button>
   </form>
 </div>
-`;
+`;  
 
 
 /* === FUNGSI INTI APLIKASI === */
@@ -403,19 +468,18 @@ function navigateTo(page) {
   } else if (page === "reports") {
     contentArea.innerHTML = analyticsTemplate;
     initAnalytics();
-  } else if (page === "customers" || page === "orders") {
-    // KEDUA link ("Customers" dan "Orders") sekarang memuat template gabungan
-    contentArea.innerHTML = customersAndOrdersTemplate;
-    initCustomersAndOrders(); // Memanggil fungsi inisialisasi gabungan
-    
-    // Pastikan link yang benar tetap aktif
-    navLinks.forEach((l) => l.classList.remove("active"));
-    const correctActiveLink = document.querySelector(`.main-nav a[data-page='${page}']`);
-    if (correctActiveLink) {
-      correctActiveLink.classList.add("active");
-    }
+  } else if (page === "customers") {
+    contentArea.innerHTML = customersTemplate;
+    initCustomers();
+  } else if (page === "orders") {
+    contentArea.innerHTML = ordersTemplate;
+    initOrders();
+  } else if (page === "dashboard") {
+    // Add dashboard case
+    contentArea.innerHTML = dashboardTemplate;
+    initDashboard();
   } else {
-    // Halaman default adalah dashboard
+    // Default fallback to dashboard
     contentArea.innerHTML = dashboardTemplate;
     initDashboard();
   }
@@ -470,29 +534,10 @@ function initDashboard() {
 }
 
 /* --- Inisialisasi Halaman GABUNGAN (Customers & Orders) --- */
-function initCustomersAndOrders() {
-
-  /* === BAGIAN ORDERS (tidak diubah, tetap berfungsi) === */
-  let editingTransactionId = null;
-
-  function updateSummary() {
-    const total = transactions.length;
-    const ongoing = transactions.filter(t => t.status === "Ongoing").length;
-    const pending = transactions.filter(t => t.status === "Pending").length;
-    const completed = transactions.filter(t => t.status === "Completed").length;
-    const revenue = transactions.reduce((sum, t) => sum + t.amount, 0);
-
-    document.getElementById("totalOrders").textContent = total;
-    document.getElementById("ongoingOrders").textContent = ongoing;
-    document.getElementById("pendingOrders").textContent = pending;
-    document.getElementById("completedOrders").textContent = completed;
-    document.getElementById("totalRevenue").textContent = `$${revenue.toLocaleString()}`;
-  }
-
-  function getStatusClass(status) {
-    const statusMap = { 'Ongoing': 'status-ongoing', 'Pending': 'status-pending', 'Completed': 'status-completed', 'Shipped': 'status-shipped' };
-    return statusMap[status] || 'status-ongoing';
-  }
+/* --- Inisialisasi Halaman Orders --- */
+/* --- Inisialisasi Halaman Orders --- */
+function initOrders() {
+  let editingOrderId = null;
 
   function renderOngoingTransactions(filteredTransactions = transactions) {
     const tbody = document.getElementById("transactionBody");
@@ -501,21 +546,27 @@ function initCustomersAndOrders() {
     filteredTransactions.forEach(transaction => {
       const row = document.createElement("tr");
       row.innerHTML = `
-        <td>${transaction.id}</td>
-        <td>${transaction.customer}</td>
-        <td>${transaction.product}</td>
-        <td>${transaction.date}</td>
-        <td>${transaction.payment}</td>
-        <td>$${transaction.amount.toLocaleString()}</td>
+        <td>${transaction.orderId}</td>
+        <td>${transaction.customerId}</td>
+        <td>${transaction.transactionId}</td>
+        <td>${transaction.productId}</td>
+        <td>${transaction.productName}</td>
+        <td>${transaction.quantity}</td>
+        <td>${transaction.unitPrice.toFixed(2)}</td>
+        <td>${transaction.total.toFixed(2)}</td>
         <td><span class="status-badge ${getStatusClass(transaction.status)}">${transaction.status}</span></td>
         <td>
-          <button class="action-btn" onclick="editTransaction('${transaction.id}')">Edit</button>
-          <button class="action-btn delete" onclick="deleteTransaction('${transaction.id}')">Delete</button>
+          <button class="action-btn" onclick="editOrder('${transaction.orderId}')">Edit</button>
+          <button class="action-btn delete" onclick="deleteOrder('${transaction.orderId}')">Delete</button>
         </td>
       `;
       tbody.appendChild(row);
     });
-    updateSummary();
+  }
+
+  function getStatusClass(status) {
+    const statusMap = { 'Ongoing': 'status-ongoing', 'Pending': 'status-pending', 'Completed': 'status-completed', 'Shipped': 'status-shipped' };
+    return statusMap[status] || 'status-ongoing';
   }
 
   function filterTransactions() {
@@ -524,36 +575,47 @@ function initCustomersAndOrders() {
     const searchTerm = document.getElementById("searchInput").value.toLowerCase();
     let filtered = transactions;
     if (statusFilter !== "all") filtered = filtered.filter(t => t.status === statusFilter);
-    if (paymentFilter !== "all") filtered = filtered.filter(t => t.payment === paymentFilter);
     if (searchTerm) {
       filtered = filtered.filter(t =>
-        t.id.toLowerCase().includes(searchTerm) ||
-        t.customer.toLowerCase().includes(searchTerm) ||
-        t.product.toLowerCase().includes(searchTerm)
+        t.orderId.toLowerCase().includes(searchTerm) ||
+        t.customerId.toLowerCase().includes(searchTerm) ||
+        t.transactionId.toLowerCase().includes(searchTerm) ||
+        t.productId.toLowerCase().includes(searchTerm) ||
+        t.productName.toLowerCase().includes(searchTerm)
       );
     }
     renderOngoingTransactions(filtered);
   }
 
-  window.editTransaction = function(id) {
-    const transaction = transactions.find(t => t.id === id);
+  // Auto-calculate total when quantity or unit price changes
+  function calculateTotal() {
+    const quantity = parseFloat(document.getElementById("quantity").value) || 0;
+    const unitPrice = parseFloat(document.getElementById("unitPrice").value) || 0;
+    const total = quantity * unitPrice;
+    document.getElementById("totalAmount").value = total.toFixed(2);
+  }
+
+  window.editOrder = function(orderId) {
+    const transaction = transactions.find(t => t.orderId === orderId);
     if (transaction) {
-      editingTransactionId = id;
+      editingOrderId = orderId;
       document.getElementById("sidebarTitle").textContent = "Edit Transaction";
-      document.getElementById("transactionId").value = transaction.id;
-      document.getElementById("customerName").value = transaction.customer;
-      document.getElementById("productName").value = transaction.product;
-      document.getElementById("transactionDate").value = transaction.date;
-      document.getElementById("paymentMethod").value = transaction.payment;
-      document.getElementById("totalAmount").value = transaction.amount;
+      document.getElementById("orderId").value = transaction.orderId;
+      document.getElementById("customerId").value = transaction.customerId;
+      document.getElementById("transactionId").value = transaction.transactionId;
+      document.getElementById("productId").value = transaction.productId;
+      document.getElementById("productName").value = transaction.productName;
+      document.getElementById("quantity").value = transaction.quantity;
+      document.getElementById("unitPrice").value = transaction.unitPrice;
+      document.getElementById("totalAmount").value = transaction.total.toFixed(2);
       document.getElementById("status").value = transaction.status;
       document.getElementById("transactionSidebar").classList.add("active");
     }
   };
 
-  window.deleteTransaction = function(id) {
+  window.deleteOrder = function(orderId) {
     if (confirm("Are you sure you want to delete this transaction?")) {
-      const index = transactions.findIndex(t => t.id === id);
+      const index = transactions.findIndex(t => t.orderId === orderId);
       if (index > -1) {
         transactions.splice(index, 1);
         saveOngoingTransactions();
@@ -565,13 +627,17 @@ function initCustomersAndOrders() {
   const addNewBtn = document.getElementById("addNewBtn");
   if (addNewBtn) {
     addNewBtn.addEventListener("click", () => {
-      editingTransactionId = null;
+      editingOrderId = null;
       document.getElementById("sidebarTitle").textContent = "Add New Transaction";
       document.getElementById("transactionForm").reset();
-      const newId = `TXN${String(transactions.length + 1).padStart(3, '0')}`;
-      document.getElementById("transactionId").value = newId;
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById("transactionDate").value = today;
+      
+      // Generate new IDs
+      const newOrderNum = transactions.length > 0 ? Math.max(...transactions.map(t => parseInt(t.orderId))) + 1 : 20001;
+      const newTxnNum = transactions.length > 0 ? Math.max(...transactions.map(t => parseInt(t.transactionId.replace('TXN', '')))) + 1 : 1;
+      
+      document.getElementById("orderId").value = String(newOrderNum);
+      document.getElementById("transactionId").value = `TXN${String(newTxnNum).padStart(3, '0')}`;
+      document.getElementById("totalAmount").value = "0.00";
       document.getElementById("transactionSidebar").classList.add("active");
     });
   }
@@ -583,26 +649,57 @@ function initCustomersAndOrders() {
     });
   }
 
+  // Add listeners for auto-calculation
+  const quantityInput = document.getElementById("quantity");
+  const unitPriceInput = document.getElementById("unitPrice");
+  if (quantityInput) quantityInput.addEventListener("input", calculateTotal);
+  if (unitPriceInput) unitPriceInput.addEventListener("input", calculateTotal);
+
   const transactionForm = document.getElementById("transactionForm");
   if (transactionForm) {
     transactionForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const transactionData = {
-        id: document.getElementById("transactionId").value,
-        customer: document.getElementById("customerName").value,
-        product: document.getElementById("productName").value,
-        date: document.getElementById("transactionDate").value,
-        payment: document.getElementById("paymentMethod").value,
-        amount: parseFloat(document.getElementById("totalAmount").value),
+        orderId: document.getElementById("orderId").value,
+        customerId: document.getElementById("customerId").value,
+        transactionId: document.getElementById("transactionId").value,
+        productId: document.getElementById("productId").value,
+        productName: document.getElementById("productName").value,
+        quantity: parseInt(document.getElementById("quantity").value),
+        unitPrice: parseFloat(document.getElementById("unitPrice").value),
+        total: parseFloat(document.getElementById("totalAmount").value),
         status: document.getElementById("status").value
       };
-      if (editingTransactionId) {
-        const index = transactions.findIndex(t => t.id === editingTransactionId);
+      
+      if (editingOrderId) {
+        const index = transactions.findIndex(t => t.orderId === editingOrderId);
         if (index > -1) transactions[index] = transactionData;
       } else {
         transactions.push(transactionData);
       }
+      
       saveOngoingTransactions();
+      
+      // If status is "Completed", also add to transactionsData
+      if (transactionData.status === "Completed") {
+        const existingInHistory = transactionsData.find(t => t.orderId === transactionData.orderId);
+        if (!existingInHistory) {
+          transactionsData.push({
+            orderId: transactionData.orderId,
+            customerId: transactionData.customerId,
+            transactionId: transactionData.transactionId,
+            productId: transactionData.productId,
+            productName: transactionData.productName,
+            quantity: transactionData.quantity,
+            unitPrice: transactionData.unitPrice,
+            subtotal: transactionData.total,
+            month: new Date().toLocaleString('en-US', { month: 'long' }),
+            region: "Asia Pacific (APAC)"
+          });
+          localStorage.setItem("transactionsData", JSON.stringify(transactionsData));
+        }
+      }
+      
       document.getElementById("transactionSidebar").classList.remove("active");
       filterTransactions();
     });
@@ -614,8 +711,10 @@ function initCustomersAndOrders() {
   });
 
   renderOngoingTransactions();
+}
 
-  /* === BAGIAN CUSTOMERS (ditambah fungsi auto hitung total) === */
+/* --- Inisialisasi Halaman Customers --- */
+function initCustomers() {
   const customerSidebar = document.getElementById("customerSidebar");
   const customerForm = document.getElementById("customerForm");
   const addCustomerBtn = document.getElementById("addCustomerBtn");
@@ -626,7 +725,6 @@ function initCustomersAndOrders() {
 
   let editingCustomerId = null;
 
-  // 🔹 Render Customer List
   function renderCustomers() {
     customersTableBody.innerHTML = "";
     customersData.forEach((customer) => {
@@ -646,10 +744,14 @@ function initCustomersAndOrders() {
     });
   }
 
-  // 🔹 Render Transaction History
-  function renderCustomerTransactions() {
+    function renderCustomerTransactions() {
     transactionTableBody.innerHTML = "";
-    transactionsData.forEach((transaction) => {
+    
+    // Filter transactions array to only get completed ones
+    const completedOrders = transactions.filter(t => t.status === "Completed");
+    
+    // Display completed transactions
+    completedOrders.forEach((transaction) => {
       const row = document.createElement("tr");
       row.innerHTML = `
         <td>${transaction.orderId}</td>
@@ -659,12 +761,18 @@ function initCustomersAndOrders() {
         <td>${transaction.productName}</td>
         <td>${transaction.quantity}</td>
         <td>${transaction.unitPrice.toFixed(2)}</td>
-        <td>${transaction.subtotal.toFixed(2)}</td>`;
+        <td>${transaction.total.toFixed(2)}</td>`;
       transactionTableBody.appendChild(row);
     });
+    
+    // If no completed transactions, show a message
+    if (completedOrders.length === 0) {
+      const row = document.createElement("tr");
+      row.innerHTML = `<td colspan="8" style="text-align: center; color: #666; padding: 20px;">No completed transactions yet</td>`;
+      transactionTableBody.appendChild(row);
+    }
   }
 
-  // 🔹 Tambah perhitungan otomatis untuk Total Amount
   const totalTransEl = document.getElementById("custTotalTransaction");
   const amountPerTransEl = document.getElementById("custAmountPerTransaction");
   const totalAmountEl = document.getElementById("custTotalAmount");
@@ -679,7 +787,6 @@ function initCustomersAndOrders() {
     amountPerTransEl.addEventListener("input", updateTotalAmount);
   }
 
-  // 🔹 Edit Customer
   window.editCustomer = function (id) {
     const c = customersData.find((x) => x.id === id);
     if (c) {
@@ -698,7 +805,6 @@ function initCustomersAndOrders() {
     }
   };
 
-  // 🔹 Delete Customer
   window.deleteCustomer = function (id) {
     if (confirm("Are you sure you want to delete this customer?")) {
       const idx = customersData.findIndex((x) => x.id === id);
@@ -710,7 +816,6 @@ function initCustomersAndOrders() {
     }
   };
 
-  // 🔹 Add New Customer
   addCustomerBtn.onclick = () => {
     editingCustomerId = null;
     customerForm.reset();
@@ -721,7 +826,6 @@ function initCustomersAndOrders() {
     customerSidebar.classList.add("active");
   };
 
-  // 🔹 Cancel dan Close Sidebar
   [closeCustomerSidebarBtn, cancelCustomerBtn].forEach(btn => {
     if (btn) btn.onclick = () => {
       customerSidebar.classList.remove("active");
@@ -730,7 +834,6 @@ function initCustomersAndOrders() {
     };
   });
 
-  // 🔹 Submit Customer
   customerForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const id = document.getElementById("custId").value.trim();
