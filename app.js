@@ -68,6 +68,13 @@ let products = JSON.parse(localStorage.getItem("productsData")) || [
   { id: "P4P11", name: "Nashua Top1 Fragile Tape (48mm x 66m)", category: "Warning Tape", price: 22000, supply: "Active", stock: "Active", width: 48, length: 66, rating: 4.8 }
 ];
 
+let marketShareData = [
+  { company: "Nashua Industrial Tape", share: 35, color: "#8b2e3b" },
+  { company: "3M", share: 25, color: "#b84452" },
+  { company: "Bostik", share: 15, color: "#c94f5e" },
+  { company: "Gorilla", share: 12, color: "#ff6b7a" },
+  { company: "Others", share: 13, color: "#666" }
+];
 
 // Data untuk Sales Pipeline (Deals) - Dimuat dari LocalStorage
 let deals = JSON.parse(localStorage.getItem("salesDeals")) || [
@@ -256,7 +263,7 @@ const analyticsTemplate = `
     <div class="metric-grid" id="performanceMetrics"></div>
   </div>
 
-  <div class="analytics-card">
+<div class="analytics-card">
     <h3>Customer Retention</h3>
     <div style="margin-bottom: 20px;">
       <h4 style="margin: 0 0 10px 0; font-size: 14px; opacity: 0.9;">Regular Customers (2+ Transactions)</h4>
@@ -273,14 +280,23 @@ const analyticsTemplate = `
       </table>
     </div>
   </div>
-
   <div class="analytics-card">
-    <h3>Sales Trend Analysis</h3>
-    <div class="deals-info">
-      <div class="deals-info-item"><div class="deals-label">Deals Open</div><div class="deals-value" id="dealsOpen">0</div></div>
-      <div class="deals-info-item"><div class="deals-label">Deals Closed</div><div class="deals-value" id="dealsClosed">0</div></div>
+    <div class="analytics-card full-width">
+      <h3>Sales Trend Analysis</h3>
+      <div class="deals-info">
+        <div class="deals-info-item"><div class="deals-label">Deals Open</div><div class="deals-value" id="dealsOpen">0</div></div>
+        <div class="deals-info-item"><div class="deals-label">Deals Closed</div><div class="deals-value" id="dealsClosed">0</div></div>
+      </div>
+      <div class="chart-container"><canvas id="salesTrendChart"></canvas></div>
     </div>
-    <div class="chart-container"><canvas id="salesTrendChart"></canvas></div>
+  
+    <div class="analytics-card">
+      <h3>Market Share Graphics</h3>
+      <div class="chart-container" style="height: 300px;">
+        <canvas id="marketShareChart"></canvas>
+      </div>
+      <div class="market-share-legend" id="marketShareLegend"></div>
+    </div>
   </div>
 
   <div class="analytics-card full-width">
@@ -1072,7 +1088,49 @@ function initAnalytics() {
       }
     });
   }
-
+  // 5. Market Share Pie Chart
+  const marketCtx = document.getElementById("marketShareChart");
+  if (marketCtx) {
+    new Chart(marketCtx, {
+      type: "pie",
+      data: {
+        labels: marketShareData.map(d => d.company),
+        datasets: [{
+          data: marketShareData.map(d => d.share),
+          backgroundColor: marketShareData.map(d => d.color),
+          borderWidth: 2,
+          borderColor: '#fff'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false  // ← Changed from true to false
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return context.label + ': ' + context.parsed + '%';
+              }
+            }
+          }
+        }
+      }
+    });
+    
+    // Custom legend with percentages
+    const legendDiv = document.getElementById("marketShareLegend");
+    if (legendDiv) {
+      legendDiv.innerHTML = marketShareData.map(item => `
+        <div class="legend-item">
+          <span class="legend-color" style="background: ${item.color}"></span>
+          <span class="legend-text">${item.company}: <strong>${item.share}%</strong></span>
+        </div>
+      `).join('');
+    }
+  }
   // 5. Product List (Diperbarui dengan Edit/Delete)
   function renderProducts() {
     const productTable = document.getElementById("productTable");
