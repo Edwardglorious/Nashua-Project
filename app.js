@@ -873,20 +873,59 @@ function initAnalytics() {
     });
   }
 
-  // 4. Sales Trend Analysis - Chart
+// 4. Sales Trend Analysis - Chart
   const dealsOpenEl = document.getElementById("dealsOpen");
   const dealsClosedEl = document.getElementById("dealsClosed");
   if (dealsOpenEl) { dealsOpenEl.textContent = pipelineData.lead + pipelineData.qualification + pipelineData.proposal + pipelineData.negotiation; }
   if (dealsClosedEl) { dealsClosedEl.textContent = pipelineData.closedWon; }
+  
+  // Calculate monthly sales amounts
+  const monthlySales = {};
+  monthOrder.forEach(month => {
+    monthlySales[month] = monthlyStats[month] ? monthlyStats[month].totalAmount : 0;
+  });
+  
   const ctx = document.getElementById("salesTrendChart");
   if (ctx) {
     new Chart(ctx, {
-      type: "doughnut",
+      type: "bar",
       data: {
-        labels: ["Closed Won", "In Progress"],
-        datasets: [{ data: [pipelineData.closedWon, pipelineData.lead + pipelineData.qualification + pipelineData.proposal + pipelineData.negotiation], backgroundColor: ["#4CAF50", "#2196F3"], borderWidth: 0 }]
+        labels: monthOrder,
+        datasets: [{
+          label: "Sales Amount (USD)",
+          data: Object.values(monthlySales),
+          backgroundColor: "#8b2e3b",
+          borderColor: "#b84452",
+          borderWidth: 1
+        }]
       },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "right" } } }
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: function(value) {
+                return '$' + value.toLocaleString();
+              }
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: true,
+            position: "top"
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return context.dataset.label + ': $' + context.parsed.y.toLocaleString();
+              }
+            }
+          }
+        }
+      }
     });
   }
 
