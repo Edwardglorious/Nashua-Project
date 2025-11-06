@@ -2032,77 +2032,84 @@ function initUploadData() {
 
 
   function processData(rawData) {
-
     const data = rawData.filter(row => row && Object.keys(row).length > 0);
-
     
+    if (data.length === 0) {
+      return {
+        summary: { totalRecords: 0, totalRevenue: 0, avgOrderValue: 0, topProduct: 'N/A' },
+        insights: ['No valid data found in the uploaded file'],
+        data: [],
+        chartData: null
+      };
+    }
+
+    // Get all column headers from first row
+    const headers = Object.keys(data[0]).map(h => h.toLowerCase().trim());
+    console.log('Column headers found:', headers); // Debug log
 
     let totalRevenue = 0;
-
     let productSales = {};
-
     let monthlySales = {};
 
-
-
     data.forEach(row => {
-
-      const amount = parseFloat(row.Total_Amount || row.total || row.amount || row.subtotal || 0);
-
+      // Find amount column (more flexible matching)
+      let amount = 0;
+      for (let key in row) {
+        const lowerKey = key.toLowerCase().trim();
+        if (lowerKey.includes('total') || lowerKey.includes('amount') || 
+            lowerKey.includes('subtotal') || lowerKey.includes('price')) {
+          amount = parseFloat(row[key]) || 0;
+          if (amount > 0) break; // Use first valid amount found
+        }
+      }
       totalRevenue += amount;
 
-
-
-      const product = row.Product_Name || row.product || row.item || 'Unknown';
-
+      // Find product name column
+      let product = 'Unknown';
+      for (let key in row) {
+        const lowerKey = key.toLowerCase().trim();
+        if (lowerKey.includes('product') || lowerKey.includes('item') || 
+            lowerKey.includes('name')) {
+          product = row[key] || 'Unknown';
+          if (product !== 'Unknown') break;
+        }
+      }
       productSales[product] = (productSales[product] || 0) + amount;
 
-
-
-      const month = row.Month || row.month || row.date || 'Unknown';
-
+      // Find month/date column
+      let month = 'Unknown';
+      for (let key in row) {
+        const lowerKey = key.toLowerCase().trim();
+        if (lowerKey.includes('month') || lowerKey.includes('date') || 
+            lowerKey.includes('period')) {
+          month = row[key] || 'Unknown';
+          if (month !== 'Unknown') break;
+        }
+      }
       monthlySales[month] = (monthlySales[month] || 0) + amount;
-
     });
 
+    const topProduct = Object.keys(productSales).length > 0 
+      ? Object.keys(productSales).reduce((a, b) => 
+          productSales[a] > productSales[b] ? a : b, 'Unknown')
+      : 'N/A';
 
-
-    const topProduct = Object.keys(productSales).reduce((a, b) => 
-
-      productSales[a] > productSales[b] ? a : b, 'N/A'
-
-    );
-
-
+    console.log('Calculated totals:', { totalRevenue, topProduct, recordCount: data.length }); // Debug log
 
     return {
-
       summary: {
-
         totalRecords: data.length,
-
         totalRevenue: totalRevenue,
-
-        avgOrderValue: totalRevenue / data.length,
-
+        avgOrderValue: data.length > 0 ? totalRevenue / data.length : 0,
         topProduct: topProduct
-
       },
-
       insights: generateInsights(data, totalRevenue, topProduct),
-
       data: data,
-
       chartData: {
-
         labels: Object.keys(monthlySales),
-
         values: Object.values(monthlySales)
-
       }
-
     };
-
   }
 
 
