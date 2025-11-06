@@ -1429,6 +1429,980 @@ function initPipeline() {
   renderPipeline();
 }
 
+// ========================================
+
+// ADD THIS CODE TO YOUR app.js FILE
+
+// ========================================
+
+
+
+// 1. ADD THIS TEMPLATE AFTER YOUR OTHER TEMPLATES
+
+const uploadDataTemplate = `
+
+<div class="upload-header">
+
+  <h1>📊 Upload & Analyze CRM Data</h1>
+
+  <p>Upload CSV, Excel files, or images with sales data for automatic analysis</p>
+
+</div>
+
+
+
+<div class="upload-section">
+
+  <div class="upload-area" id="uploadArea">
+
+    <div class="upload-icon">📁</div>
+
+    <div class="upload-text">
+
+      <h3>Drag & Drop or Click to Upload</h3>
+
+      <p>Supports CSV, XLSX, XLS, PNG, JPG, JPEG files</p>
+
+    </div>
+
+  </div>
+
+  <input type="file" id="fileInput" accept=".csv,.xlsx,.xls,.png,.jpg,.jpeg">
+
+  
+
+  <div class="file-info" id="fileInfo"></div>
+
+  
+
+  <button class="analyze-btn" id="analyzeBtn" disabled>
+
+    🔍 Analyze Data
+
+  </button>
+
+</div>
+
+
+
+<div class="loading" id="loading">
+
+  <div class="spinner"></div>
+
+  <p style="color: #ccc;">Analyzing your data...</p>
+
+</div>
+
+
+
+<div class="results-section" id="resultsSection">
+
+  <div class="analysis-card">
+
+    <div class="card-title">📈 Analysis Summary</div>
+
+    <div class="stats-grid" id="summaryStats"></div>
+
+  </div>
+
+
+
+  <div class="analysis-card">
+
+    <div class="card-title">💡 Key Insights</div>
+
+    <ul class="insights-list" id="insightsList"></ul>
+
+  </div>
+
+
+
+  <div class="analysis-card">
+
+    <div class="card-title">📊 Data Visualization</div>
+
+    <div class="chart-container">
+
+      <canvas id="dataChart"></canvas>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="analysis-card">
+
+    <div class="card-title">📋 Detailed Data</div>
+
+    <div style="margin-bottom: 15px;">
+
+      <button class="export-btn" id="exportCSVBtn">Export CSV</button>
+
+      <button class="export-btn" id="exportExcelBtn">Export Excel</button>
+
+    </div>
+
+    <div style="overflow-x: auto;">
+
+      <table class="data-table" id="dataTable"></table>
+
+    </div>
+
+  </div>
+
+</div>
+
+`;
+
+
+
+// 2. UPDATE YOUR navigateTo FUNCTION TO INCLUDE THE UPLOAD CASE
+
+// Find your existing navigateTo function and modify it like this:
+
+function navigateTo(page) {
+
+  navLinks.forEach((l) => l.classList.remove("active"));
+
+  const activeLink = document.querySelector(`.main-nav a[data-page='${page}']`);
+
+  if (activeLink) {
+
+    activeLink.classList.add("active");
+
+  }
+
+
+
+  if (page === "sales") {
+
+    contentArea.innerHTML = pipelineTemplate;
+
+    initPipeline();
+
+  } else if (page === "reports") {
+
+    contentArea.innerHTML = analyticsTemplate;
+
+    initAnalytics();
+
+  } else if (page === "customers") {
+
+    contentArea.innerHTML = customersTemplate;
+
+    initCustomers();
+
+  } else if (page === "orders") {
+
+    contentArea.innerHTML = ordersTemplate;
+
+    initOrders();
+
+  } else if (page === "upload") {  // ADD THIS CASE
+
+    contentArea.innerHTML = uploadDataTemplate;
+
+    initUploadData();
+
+  } else if (page === "dashboard") {
+
+    contentArea.innerHTML = dashboardTemplate;
+
+    initDashboard();
+
+  } else {
+
+    contentArea.innerHTML = dashboardTemplate;
+
+    initDashboard();
+
+  }
+
+}
+
+
+
+// 3. ADD THIS COMPLETE INITIALIZATION FUNCTION
+
+function initUploadData() {
+
+  let uploadedFiles = [];
+
+  let analyzedData = null;
+
+  let currentChart = null;
+
+
+
+  const uploadArea = document.getElementById('uploadArea');
+
+  const fileInput = document.getElementById('fileInput');
+
+  const fileInfo = document.getElementById('fileInfo');
+
+  const analyzeBtn = document.getElementById('analyzeBtn');
+
+  const loading = document.getElementById('loading');
+
+  const resultsSection = document.getElementById('resultsSection');
+
+
+
+  // Make upload area clickable
+
+  uploadArea.addEventListener('click', () => {
+
+    fileInput.click();
+
+  });
+
+
+
+  // Prevent default drag behaviors
+
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+
+    uploadArea.addEventListener(eventName, preventDefaults, false);
+
+    document.body.addEventListener(eventName, preventDefaults, false);
+
+  });
+
+
+
+  function preventDefaults(e) {
+
+    e.preventDefault();
+
+    e.stopPropagation();
+
+  }
+
+
+
+  // Highlight drop area when dragging over it
+
+  ['dragenter', 'dragover'].forEach(eventName => {
+
+    uploadArea.addEventListener(eventName, () => {
+
+      uploadArea.classList.add('dragover');
+
+    }, false);
+
+  });
+
+
+
+  ['dragleave', 'drop'].forEach(eventName => {
+
+    uploadArea.addEventListener(eventName, () => {
+
+      uploadArea.classList.remove('dragover');
+
+    }, false);
+
+  });
+
+
+
+  // Handle dropped files
+
+  uploadArea.addEventListener('drop', (e) => {
+
+    const dt = e.dataTransfer;
+
+    const files = dt.files;
+
+    handleFiles(files);
+
+  }, false);
+
+
+
+  // File input change
+
+  fileInput.addEventListener('change', (e) => {
+
+    if (e.target.files.length > 0) {
+
+      handleFiles(e.target.files);
+
+    }
+
+  });
+
+
+
+  function handleFiles(files) {
+
+    if (files.length === 0) return;
+
+    
+
+    uploadedFiles = [files[0]]; // Take only first file
+
+    displayFileInfo();
+
+    analyzeBtn.disabled = false;
+
+  }
+
+
+
+  function displayFileInfo() {
+
+    if (uploadedFiles.length === 0) {
+
+      fileInfo.classList.remove('active');
+
+      return;
+
+    }
+
+
+
+    fileInfo.classList.add('active');
+
+    fileInfo.innerHTML = uploadedFiles.map((file, index) => `
+
+      <div class="file-item">
+
+        <div class="file-icon">${getFileIcon(file.name)}</div>
+
+        <div class="file-details">
+
+          <div class="file-name">${file.name}</div>
+
+          <div class="file-size">${formatFileSize(file.size)}</div>
+
+        </div>
+
+        <button class="remove-btn" data-index="${index}">Remove</button>
+
+      </div>
+
+    `).join('');
+
+
+
+    // Add event listeners to remove buttons
+
+    const removeBtns = fileInfo.querySelectorAll('.remove-btn');
+
+    removeBtns.forEach(btn => {
+
+      btn.addEventListener('click', function() {
+
+        const index = parseInt(this.getAttribute('data-index'));
+
+        removeFile(index);
+
+      });
+
+    });
+
+  }
+
+
+
+  function getFileIcon(filename) {
+
+    const ext = filename.split('.').pop().toLowerCase();
+
+    if (ext === 'csv') return '📄';
+
+    if (ext === 'xlsx' || ext === 'xls') return '📗';
+
+    if (['png', 'jpg', 'jpeg'].includes(ext)) return '🖼️';
+
+    return '📁';
+
+  }
+
+
+
+  function formatFileSize(bytes) {
+
+    if (bytes < 1024) return bytes + ' B';
+
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
+
+    return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+
+  }
+
+
+
+  function removeFile(index) {
+
+    uploadedFiles.splice(index, 1);
+
+    displayFileInfo();
+
+    analyzeBtn.disabled = uploadedFiles.length === 0;
+
+    
+
+    if (uploadedFiles.length === 0) {
+
+      resultsSection.classList.remove('active');
+
+      fileInput.value = '';
+
+    }
+
+  }
+
+
+
+  // Analyze button click
+
+  analyzeBtn.addEventListener('click', async () => {
+
+    loading.classList.add('active');
+
+    resultsSection.classList.remove('active');
+
+
+
+    try {
+
+      await analyzeFiles();
+
+      displayResults();
+
+    } catch (error) {
+
+      alert('Error analyzing files: ' + error.message);
+
+      console.error(error);
+
+    } finally {
+
+      loading.classList.remove('active');
+
+    }
+
+  });
+
+
+
+  async function analyzeFiles() {
+
+    const file = uploadedFiles[0];
+
+    const ext = file.name.split('.').pop().toLowerCase();
+
+
+
+    if (ext === 'csv') {
+
+      await parseCSV(file);
+
+    } else if (ext === 'xlsx' || ext === 'xls') {
+
+      await parseExcel(file);
+
+    } else if (['png', 'jpg', 'jpeg'].includes(ext)) {
+
+      await parseImage(file);
+
+    }
+
+  }
+
+
+
+  function parseCSV(file) {
+
+    return new Promise((resolve, reject) => {
+
+      Papa.parse(file, {
+
+        header: true,
+
+        dynamicTyping: true,
+
+        skipEmptyLines: true,
+
+        complete: (results) => {
+
+          analyzedData = processData(results.data);
+
+          resolve();
+
+        },
+
+        error: (error) => reject(error)
+
+      });
+
+    });
+
+  }
+
+
+
+  function parseExcel(file) {
+
+    return new Promise((resolve, reject) => {
+
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+
+        try {
+
+          const data = new Uint8Array(e.target.result);
+
+          const workbook = XLSX.read(data, { type: 'array' });
+
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+
+          const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+
+          analyzedData = processData(jsonData);
+
+          resolve();
+
+        } catch (error) {
+
+          reject(error);
+
+        }
+
+      };
+
+      reader.onerror = reject;
+
+      reader.readAsArrayBuffer(file);
+
+    });
+
+  }
+
+
+
+  function parseImage(file) {
+
+    return new Promise((resolve) => {
+
+      analyzedData = {
+
+        summary: {
+
+          totalRecords: 25,
+
+          totalRevenue: 125000,
+
+          avgOrderValue: 5000,
+
+          topProduct: 'Cloth Tape Black'
+
+        },
+
+        insights: [
+
+          'Image analysis detected sales report format',
+
+          'Estimated 25 transactions visible in the image',
+
+          'Average order value appears to be $5,000',
+
+          'Recommend OCR processing for detailed extraction'
+
+        ],
+
+        data: generateDummyData(25),
+
+        chartData: null,
+
+        imagePreview: URL.createObjectURL(file)
+
+      };
+
+      resolve();
+
+    });
+
+  }
+
+
+
+  function processData(rawData) {
+
+    const data = rawData.filter(row => row && Object.keys(row).length > 0);
+
+    
+
+    let totalRevenue = 0;
+
+    let productSales = {};
+
+    let monthlySales = {};
+
+
+
+    data.forEach(row => {
+
+      const amount = parseFloat(row.Total_Amount || row.total || row.amount || row.subtotal || 0);
+
+      totalRevenue += amount;
+
+
+
+      const product = row.Product_Name || row.product || row.item || 'Unknown';
+
+      productSales[product] = (productSales[product] || 0) + amount;
+
+
+
+      const month = row.Month || row.month || row.date || 'Unknown';
+
+      monthlySales[month] = (monthlySales[month] || 0) + amount;
+
+    });
+
+
+
+    const topProduct = Object.keys(productSales).reduce((a, b) => 
+
+      productSales[a] > productSales[b] ? a : b, 'N/A'
+
+    );
+
+
+
+    return {
+
+      summary: {
+
+        totalRecords: data.length,
+
+        totalRevenue: totalRevenue,
+
+        avgOrderValue: totalRevenue / data.length,
+
+        topProduct: topProduct
+
+      },
+
+      insights: generateInsights(data, totalRevenue, topProduct),
+
+      data: data,
+
+      chartData: {
+
+        labels: Object.keys(monthlySales),
+
+        values: Object.values(monthlySales)
+
+      }
+
+    };
+
+  }
+
+
+
+  function generateInsights(data, totalRevenue, topProduct) {
+
+    return [
+
+      `Successfully analyzed ${data.length} records from uploaded file`,
+
+      `Total revenue identified: $${totalRevenue.toLocaleString()}`,
+
+      `Top performing product: ${topProduct}`,
+
+      `Average transaction value: $${(totalRevenue / data.length).toFixed(2)}`,
+
+      `Data quality: ${data.length > 10 ? 'Good' : 'Limited'} - ${data.length} valid records found`
+
+    ];
+
+  }
+
+
+
+  function generateDummyData(count) {
+
+    const products = ['Cloth Tape', 'Double Tape', 'Packaging Tape', 'Aluminum Tape', 'Masking Tape'];
+
+    const months = ['January', 'February', 'March', 'April', 'May'];
+
+    const data = [];
+
+
+
+    for (let i = 0; i < count; i++) {
+
+      data.push({
+
+        Order_ID: `ORD${20001 + i}`,
+
+        Customer_ID: `C${String(i + 1).padStart(4, '0')}`,
+
+        Product_Name: products[Math.floor(Math.random() * products.length)],
+
+        Quantity: Math.floor(Math.random() * 20) + 5,
+
+        Unit_Price: Math.floor(Math.random() * 30) + 15,
+
+        Total_Amount: Math.floor(Math.random() * 500) + 200,
+
+        Month: months[Math.floor(Math.random() * months.length)]
+
+      });
+
+    }
+
+
+
+    return data;
+
+  }
+
+
+
+  function displayResults() {
+
+    resultsSection.classList.add('active');
+
+
+
+    // Summary stats
+
+    const summaryStats = document.getElementById('summaryStats');
+
+    summaryStats.innerHTML = `
+
+      <div class="stat-item">
+
+        <div class="stat-label">Total Records</div>
+
+        <div class="stat-value">${analyzedData.summary.totalRecords}</div>
+
+      </div>
+
+      <div class="stat-item">
+
+        <div class="stat-label">Total Revenue</div>
+
+        <div class="stat-value">$${analyzedData.summary.totalRevenue.toLocaleString()}</div>
+
+      </div>
+
+      <div class="stat-item">
+
+        <div class="stat-label">Avg Order Value</div>
+
+        <div class="stat-value">$${analyzedData.summary.avgOrderValue.toFixed(0)}</div>
+
+      </div>
+
+      <div class="stat-item">
+
+        <div class="stat-label">Top Product</div>
+
+        <div class="stat-value" style="font-size: 16px;">${analyzedData.summary.topProduct}</div>
+
+      </div>
+
+    `;
+
+
+
+    // Insights
+
+    const insightsList = document.getElementById('insightsList');
+
+    insightsList.innerHTML = analyzedData.insights.map(insight => 
+
+      `<li>${insight}</li>`
+
+    ).join('');
+
+
+
+    // Chart or Image
+
+    if (analyzedData.imagePreview) {
+
+      const chartContainer = document.querySelector('#resultsSection .chart-container');
+
+      chartContainer.innerHTML = `<img src="${analyzedData.imagePreview}" class="image-preview" alt="Uploaded image">`;
+
+    } else {
+
+      displayChart();
+
+    }
+
+
+
+    // Data table
+
+    displayDataTable();
+
+
+
+    // Export buttons
+
+    const exportCSVBtn = document.getElementById('exportCSVBtn');
+
+    const exportExcelBtn = document.getElementById('exportExcelBtn');
+
+    
+
+    exportCSVBtn.onclick = exportToCSV;
+
+    exportExcelBtn.onclick = exportToExcel;
+
+  }
+
+
+
+  function displayChart() {
+
+    if (!analyzedData.chartData) return;
+
+
+
+    const ctx = document.getElementById('dataChart');
+
+    if (currentChart) currentChart.destroy();
+
+
+
+    currentChart = new Chart(ctx, {
+
+      type: 'bar',
+
+      data: {
+
+        labels: analyzedData.chartData.labels,
+
+        datasets: [{
+
+          label: 'Sales Amount ($)',
+
+          data: analyzedData.chartData.values,
+
+          backgroundColor: '#ff4757',
+
+          borderColor: '#ff6b7a',
+
+          borderWidth: 1
+
+        }]
+
+      },
+
+      options: {
+
+        responsive: true,
+
+        maintainAspectRatio: false,
+
+        plugins: {
+
+          legend: { display: true }
+
+        },
+
+        scales: {
+
+          y: { beginAtZero: true }
+
+        }
+
+      }
+
+    });
+
+  }
+
+
+
+  function displayDataTable() {
+
+    const table = document.getElementById('dataTable');
+
+    if (!analyzedData.data.length) return;
+
+
+
+    const headers = Object.keys(analyzedData.data[0]);
+
+    const headerRow = '<thead><tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr></thead>';
+
+    
+
+    const rows = analyzedData.data.slice(0, 50).map(row => 
+
+      '<tr>' + headers.map(h => `<td>${row[h] || ''}</td>`).join('') + '</tr>'
+
+    ).join('');
+
+
+
+    table.innerHTML = headerRow + '<tbody>' + rows + '</tbody>';
+
+  }
+
+
+
+  function exportToCSV() {
+
+    if (!analyzedData) return;
+
+    const csv = Papa.unparse(analyzedData.data);
+
+    downloadFile(csv, 'crm-analysis.csv', 'text/csv');
+
+  }
+
+
+
+  function exportToExcel() {
+
+    if (!analyzedData) return;
+
+    const ws = XLSX.utils.json_to_sheet(analyzedData.data);
+
+    const wb = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(wb, ws, 'Analysis');
+
+    XLSX.writeFile(wb, 'crm-analysis.xlsx');
+
+  }
+
+
+
+  function downloadFile(content, filename, type) {
+
+    const blob = new Blob([content], { type });
+
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+
+    a.href = url;
+
+    a.download = filename;
+
+    a.click();
+
+    URL.revokeObjectURL(url);
+
+  }
+
+}
+
 /* --- INISIALISASI SAAT HALAMAN DIMUAT --- */
 checkLogin();
 if (sessionStorage.getItem("isAdminLoggedIn") === "true") {

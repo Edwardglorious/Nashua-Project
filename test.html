@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nashua CRM Dashboard</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Additional styles for Upload Data page */
+    .upload-section {
+      background: #2a2a2a;
+      border-radius: 12px;
+      padding: 40px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .upload-area {
+      border: 3px dashed #555;
+      border-radius: 12px;
+      padding: 60px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: #1a1a1a;
+    }
+
+    .upload-area:hover,
+    .upload-area.dragover {
+      border-color: #ff4757;
+      background: #2a2020;
+    }
+
+    .upload-icon {
+      font-size: 48px;
+      margin-bottom: 20px;
+      color: #ff4757;
+    }
+
+    .upload-text h3 {
+      font-size: 20px;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    .upload-text p {
+      color: #999;
+      font-size: 14px;
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    .file-info {
+      margin-top: 20px;
+      padding: 15px;
+      background: #1a1a1a;
+      border-radius: 8px;
+      display: none;
+    }
+
+    .file-info.active {
+      display: block;
+    }
+
+    .file-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 10px;
+      background: #2a2a2a;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+
+    .file-icon {
+      font-size: 24px;
+    }
+
+    .file-details {
+      flex: 1;
+    }
+
+    .file-name {
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 5px;
+    }
+
+    .file-size {
+      font-size: 12px;
+      color: #999;
+    }
+
+    .remove-btn {
+      background: #ff4757;
+      border: none;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: background 0.3s;
+    }
+
+    .remove-btn:hover {
+      background: #ff3344;
+    }
+
+    .analyze-btn {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(90deg, #ff4757, #ff6b7a);
+      border: none;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: transform 0.3s;
+    }
+
+    .analyze-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .analyze-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .results-section {
+      display: none;
+    }
+
+    .results-section.active {
+      display: block;
+    }
+
+    .analysis-card {
+      background: #2a2a2a;
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: #ff6b7a;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .stat-item {
+      background: linear-gradient(135deg, #8b2e3b 0%, #b84452 100%);
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      opacity: 0.9;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      color: #fff;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .insights-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .insights-list li {
+      padding: 12px;
+      background: #1a1a1a;
+      border-left: 3px solid #ff4757;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      color: #ccc;
+    }
+
+    .export-btn {
+      padding: 10px 20px;
+      background: #4caf50;
+      border: none;
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-right: 10px;
+      transition: background 0.3s;
+    }
+
+    .export-btn:hover {
+      background: #45a049;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 40px;
+    }
+
+    .loading.active {
+      display: block;
+    }
+
+    .spinner {
+      border: 4px solid #333;
+      border-top: 4px solid #ff4757;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .image-preview {
+      max-width: 100%;
+      border-radius: 8px;
+      margin-top: 15px;
+    }
+
+    .upload-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .upload-header h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, #ff4757, #ff6b7a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .upload-header p {
+      color: #ccc;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <main id="login-view">
+    <div class="login-container">
+      <form id="login-form">
+        <h2>Admin Login</h2>
+        <div class="input-group">
+          <label for="username">Email atau Username</label>
+          <input type="text" id="username" required />
+        </div>
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" required />
+        </div>
+        <button type="submit">Log In</button>
+        <p id="error-message"></p>
+      </form>
+    </div>
+  </main>
+
+  <main id="dashboard-view" class="hidden">
+    <header class="top-bar">
+      <div class="logo">
+        Nashua
+        <span class="subtext">INDUSTRIAL ADHESIVE TAPE</span>
+      </div>
+      <a href="#" id="logout-link" class="login-link">Log Out</a>
+    </header>
+
+    <nav class="main-nav">
+      <ul>
+        <li><a href="#" class="active" data-page="dashboard">Dashboard</a></li>
+        <li><a href="#" data-page="customers">Customers</a></li>
+        <li><a href="#" data-page="sales">Sales Pipeline</a></li>
+        <li><a href="#" data-page="orders">Order & Invoices</a></li>
+        <li><a href="#" data-page="reports">Analytics & Reports</a></li>
+        <li><a href="#" data-page="upload">Upload Data</a></li>
+      </ul>
+    </nav>
+
+    <div class="content-area" id="content-area">
+      <h1 style="color: #fff">Selamat Datang di Dashboard</h1>
+      <p style="color: #ccc">Ini adalah area konten utama.</p>
+      <p style="color: #ccc">Pilih menu di atas untuk navigasi.</p>
+    </div>
+  </main>
+
+  <div class="sidebar" id="productSidebar">
+    <div class="sidebar-header">
+      <h2>Add New Product</h2>
+      <button class="close-btn" id="closeProductSidebar">×</button>
+    </div>
+    <form id="productForm">
+      <div class="form-group">
+        <label>Product ID</label>
+        <input type="text" id="productId" readonly />
+      </div>
+      <div class="form-group">
+        <label>Product Name</label>
+        <input type="text" id="productName" required />
+      </div>
+      <div class="form-group">
+        <label>Category</label>
+        <select id="productCategory" required>
+          <option value="">Select Category</option>
+          <option value="Cloth Tape">Cloth Tape</option>
+          <option value="Double Tape">Double Tape</option>
+          <option value="Packaging Tape">Packaging Tape</option>
+          <option value="Aluminum Tape">Aluminum Tape</option>
+          <option value="Masking Tape">Masking Tape</option>
+          <option value="Foam Tape">Foam Tape</option>
+          <option value="Clear Tape">Clear Tape</option>
+          <option value="Warning Tape">Warning Tape</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Price (Rp)</label>
+        <input type="number" id="productPrice" required />
+      </div>
+      <div class="form-group">
+        <label>Supply Status</label>
+        <select id="productSupply" required>
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Stock Status</label>
+        <select id="productStock" required>
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Width (mm)</label>
+        <input type="number" id="productWidth" required />
+      </div>
+      <div class="form-group">
+        <label>Length (m)</label>
+        <input type="number" id="productLength" required />
+      </div>
+      <div class="form-group">
+        <label>End Customer Rating (1-5)</label>
+        <input type="number" id="productRating" min="1" max="5" step="0.1" required />
+      </div>
+      <button type="submit" class="submit-btn">Add Product</button>
+    </form>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
